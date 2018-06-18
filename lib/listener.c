@@ -11,6 +11,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 
+#include "chemicals.h"
 #include "payloads.h"
 #include "listener.h"
 #include "response.h"
@@ -20,7 +21,7 @@ void *session(void *data);
 // Opens a socket and listens for incoming connections, spins off new threads for new connections
 void *listener(void *data)
 {
-    char port[5] = "1111";
+    char port[5] = "3018";
 
     // Thread initiation
     pthread_attr_t  attr;
@@ -133,13 +134,28 @@ void *session(void *data)
         return NULL;
     }
 
-    printf("%s\n", buff);
+    struct chemicals *chems = analyze(buff, head->size);
+    if (chems)
+    {
+        printf("%u\n", chems->chlorine_sz);
+    }
+
+    struct molecule m;
+    for (int i = 0; i < sz / 8; ++i)
+    {   
+        memcpy(&m, &buff[i*8], 8);
+
+        printf("Data: %u\n", m.data);
+        printf("Left: %u\n", m.left);
+        printf("Right: %u\n\n", m.right);
+    }
 
     // Handling the data sent
-    send_downstream(buff, head);
+    // send_downstream(buff, head);
 
     free(buff);
     free(head);
+    free_chemicals(chems);
     
     // Closing the connection
     close(sd);

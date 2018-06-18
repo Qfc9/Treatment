@@ -5,9 +5,9 @@ ARFLAGS += -U
 
 DEBUG = -DDEBUG -g
 
-BINS = stormdrain
+BINS = dummy
 
-FILES = stormdrain.o ../lib/listener.o ../lib/payloads.o ../lib/response.o ../lib/chemicals.o
+FILES = dummy.o ../lib/payloads.o
 
 all: build
 

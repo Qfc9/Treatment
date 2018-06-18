@@ -12,7 +12,8 @@ DEBUG = -DDEBUG -g
 
 BINS = treatment
 
-FILES = treatment.o ../lib/listener.o ../lib/payloads.o ../lib/response.o
+FILES = treatment.o ../lib/listener.o ../lib/payloads.o ../lib/response.o ../lib/chlorine.o
+
 
 all: build
 
