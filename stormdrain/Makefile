@@ -7,7 +7,7 @@ DEBUG = -DDEBUG -g
 
 BINS = stormdrain
 
-FILES = stormdrain.o
+FILES = stormdrain.o ../lib/listener.o ../lib/payloads.o ../lib/response.o
 
 all: build
 

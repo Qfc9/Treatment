@@ -5,9 +5,9 @@ ARFLAGS += -U
 
 DEBUG = -DDEBUG -g
 
-BINS = stormdrain
+BINS = residential
 
-FILES = stormdrain.o
+FILES = residential.o ../lib/listener.o ../lib/payloads.o ../lib/response.o
 
 all: build
 
@@ -16,21 +16,21 @@ all: build
 debug: CFLAGS += -DDEBUG -g
 debug: CPPFLAGS += -DDEBUG -g
 debug:  $(FILES)
-    gcc -o $(BINS) $(FILES) $(CPPFLAGS) $(CFLAGS)
-    $(MAKE) clean
+	gcc -o $(BINS) $(FILES) $(CPPFLAGS) $(CFLAGS)
+	$(MAKE) clean
 
 profile: CFLAGS += -pg
 profile: CPPFLAGS += -pg
 profile: $(FILES)
-    gcc -o $(BINS) $(FILES) $(CPPFLAGS) $(CFLAGS)
-    $(MAKE) clean
+	gcc -o $(BINS) $(FILES) $(CPPFLAGS) $(CFLAGS)
+	$(MAKE) clean
 
 build: $(FILES)
-    gcc -o $(BINS) $(FILES) $(CPPFLAGS) $(CFLAGS)
-    $(MAKE) clean
+	gcc -o $(BINS) $(FILES) $(CPPFLAGS) $(CFLAGS)
+	$(MAKE) clean
 
 clean:
-    $(RM) *.o *.a
+	$(RM) *.o *.a
 
 cleanAll:
-    $(RM) $(BINS) *.o *.a
+	$(RM) $(BINS) *.o *.a

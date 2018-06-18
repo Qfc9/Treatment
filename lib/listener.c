@@ -13,6 +13,7 @@
 
 #include "payloads.h"
 #include "listener.h"
+#include "response.h"
 
 void *session(void *data);
 
@@ -116,26 +117,29 @@ void *session(void *data)
     free(data);
 
     // 65565
-    struct header head;
-    int sz = recv(sd, &head, sizeof(head)-1, 0);
+    struct header *head = calloc(1, sizeof(struct head *));
+    int sz = recv(sd, head, sizeof(*head), 0);
     if (sz < 1)
     {
         close(sd);
         return NULL;
     }
 
-    char *buff = calloc(1, head.size - 8);
-    sz = recv(sd, buff, sizeof(buff), 0);
+    char *buff = calloc(1, head->size - 8);
+    sz = recv(sd, buff, head->size - 8, 0);
     if (sz < 1)
     {
         close(sd);
         return NULL;
     }
+
+    printf("%s\n", buff);
 
     // Handling the data sent
-    // handleRequest(sd, buffer, www, cgi, err);
+    send_downstream(buff, head);
 
     free(buff);
+    free(head);
     
     // Closing the connection
     close(sd);
