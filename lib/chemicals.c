@@ -13,16 +13,33 @@ struct chemicals* analyze(char *data, uint16_t sz)
     chems->chlorine = NULL;
     chems->chlorine_max = 0;
     chems->chlorine_sz = 0;
+    chems->air_sz = 0;
+    chems->air = NULL;
 
     chems->chlorine_max = (unsigned int)((sz / 8) * 0.05);
 
     struct molecule m;
-    unsigned int max_cl = (unsigned int)((sz / 8) * 0.05);
     for (uint16_t i = 0; i < sz / 8; ++i)
     {   
         memcpy(&m, &data[i*8], 8);
 
-        if (m.left == m.right && m.left != 0 && m.right != 0)
+        if (m.data == 0)
+        {
+            chems->air_sz++;
+            struct chemical_idx *air = calloc(1, sizeof(struct chemical_idx));
+            air->next = NULL;
+            air->idx = i;
+
+            if (!chems->air)
+            {
+                chems->air = air;
+            }
+            else
+            {
+                add_chemical(chems->air, air);
+            }
+        }
+        else if (m.left == m.right && m.left != 0 && m.right != 0)
         {
             chems->chlorine_sz++;
             struct chemical_idx *chlorine = calloc(1, sizeof(struct chemical_idx));
@@ -45,30 +62,34 @@ struct chemicals* analyze(char *data, uint16_t sz)
 
 void add_chemical(struct chemical_idx *chems, struct chemical_idx *new_chem)
 {
+    if (!chems)
+    {
+        return;
+    }
+
+    if (!chems->next)
+    {
+        chems->next = new_chem;
+        return;
+    }
+
+    add_chemical(chems->next, new_chem);
+
     return;
 }
 
-void unchlorinate(char *data, uint16_t sz)
+void unchlorinate(char *data, struct chemicals *chems)
 {
-    struct molecule m;
-    unsigned int max_cl = (unsigned int)((sz / 8) * 0.05);
+    // struct molecule m;
 
-    for (uint16_t i = 0; i < sz / 8; ++i)
-    {   
-        memcpy(&m, &data[i*8], 8);
+    struct chemical_idx *chlorine = chems->chlorine;
 
-        if (m.left == m.right && m.left != 0)
-        {
-            if (max_cl > 0)
-            {
-                max_cl--;
-            }
-            else
-            {
-                m.right = 0;
-                memcpy(&data[i*8], &m, 8);
-            }
-        }
+    while(chlorine && (chems->chlorine_sz > chems->chlorine_max))
+    {
+        data[(chlorine->idx * 8) + 6] = 0;
+        data[(chlorine->idx * 8) + 7] = 0;
+        chlorine = chlorine->next;
+        printf("AFSDF\n");
     }
 }
 

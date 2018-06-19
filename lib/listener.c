@@ -21,7 +21,7 @@ void *session(void *data);
 // Opens a socket and listens for incoming connections, spins off new threads for new connections
 void *listener(void *data)
 {
-    char port[5] = "3018";
+    char port[5] = "1111";
 
     // Thread initiation
     pthread_attr_t  attr;
@@ -135,9 +135,11 @@ void *session(void *data)
     }
 
     struct chemicals *chems = analyze(buff, head->size);
-    if (chems)
+    printf("MAX: %zu, SZ: %zu\n", chems->chlorine_max, chems->chlorine_sz);
+    
+    if (chems->chlorine_sz > chems->chlorine_max)
     {
-        printf("%u\n", chems->chlorine_sz);
+        unchlorinate(buff, chems);
     }
 
     struct molecule m;

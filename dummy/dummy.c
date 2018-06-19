@@ -38,7 +38,7 @@ int main(void)
     m[3].left = 2;
     m[3].right = 2;
 
-    char port[5] = "3018";
+    char port[5] = "1111";
 
     // Socket setup
     struct addrinfo hints = {0};
@@ -47,7 +47,7 @@ int main(void)
 
     // Getting socket info
     struct addrinfo *results;
-    int err = getaddrinfo(NULL, port, &hints, &results);
+    int err = getaddrinfo("10.40.18.130", port, &hints, &results);
     if(err != 0) {
         fprintf(stderr, "Could not get address: %s\n", gai_strerror(err));
         return 1;

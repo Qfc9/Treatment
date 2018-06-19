@@ -24,7 +24,7 @@ void send_downstream(char *msg, struct header *head)
 
     // Getting socket info
     struct addrinfo *results;
-    int err = getaddrinfo(NULL, port, &hints, &results);
+    int err = getaddrinfo("10.40.18.151", port, &hints, &results);
     if(err != 0) {
         fprintf(stderr, "Could not get address: %s\n", gai_strerror(err));
         return;
