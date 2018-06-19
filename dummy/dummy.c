@@ -16,31 +16,38 @@
 
 int main(void)
 {
-    struct header head = {0, 8 * 5, 0};
-    struct molecule m[5];
+    struct header head = {0, 8 * 101, 0};
+    struct molecule m[100];
 
-    m[0].data = 1;
-    m[0].left = 2;
-    m[0].right = 0;
+    for (unsigned int i = 0; i < 100; ++i)
+    {
+        m[i].data = 1;
+        m[i].left = 1;
+        m[i].right = 2;
+    }
 
-
-    m[1].data = 0;
-    m[1].left = 1;
-    m[1].right = 2;
-
-
-    m[2].data = 3;
-    m[2].left = 0;
-    m[2].right = 0;
+    // m[0].data = 1;
+    // m[0].left = 2;
+    // m[0].right = 0;
 
 
-    m[3].data = 4;
-    m[3].left = 2;
-    m[3].right = 2;
+    // m[1].data = 0;
+    // m[1].left = 1;
+    // m[1].right = 2;
 
-    m[4].data = 2;
-    m[4].left = 4;
-    m[4].right = 3;
+
+    // m[2].data = 3;
+    // m[2].left = 0;
+    // m[2].right = 0;
+
+
+    // m[3].data = 4;
+    // m[3].left = 2;
+    // m[3].right = 2;
+
+    // m[4].data = 2;
+    // m[4].left = 4;
+    // m[4].right = 3;
 
     char port[5] = "1111";
 
@@ -87,10 +94,11 @@ int main(void)
     // Freeing the results
     freeaddrinfo(results);
 
-    send(sd, &head, sizeof(head), 0);
-    for (int i = 0; i < 5; ++i)
+    send(sd, &head, 8, 0);
+    send(sd, m, 100 * 8, 0);
+
+    for (int i = 0; i < 100; ++i)
     {
-        send(sd, &m[i], 8, 0);
         printf("Data: %u\n", m[i].data);
         printf("Left: %u\n", m[i].left);
         printf("Right: %u\n\n", m[i].right);

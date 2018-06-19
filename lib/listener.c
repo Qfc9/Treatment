@@ -135,22 +135,27 @@ void *session(void *data)
     }
 
     struct chemicals *chems = analyze(buff, head->size - 8);
-    printf("CL: MAX: %zu, SZ: %zu\n", chems->chlorine_max, chems->chlorine_sz);
-    printf("AIR: SZ: %zu\n", chems->air_sz);
+    printf("Total: %u\n", chems->sz/8);
+    printf("CL: MAX: %u, MIN: %u, SZ: %u\n", chems->chlorine_max, chems->chlorine_min, chems->chlorine_sz);
+    printf("AIR: SZ: %u\n", chems->air_sz);
     
     if (chems->air_sz > 0)
     {
-        deaerate(buff, chems);
+        deaerate(chems);
     }
     if (chems->chlorine_sz > chems->chlorine_max)
     {
-        unchlorinate(buff, chems);
+        unchlorinate(chems);
+    }
+    else if (chems->chlorine_sz < chems->chlorine_min)
+    {
+        chlorinate(chems);
     }
 
     struct molecule m;
-    for (int i = 0; i < sz / 8; ++i)
+    for (unsigned int i = 95; i < chems->sz / 8; ++i)
     {   
-        memcpy(&m, &buff[i*8], 8);
+        memcpy(&m, &chems->chemicals[i*8], 8);
 
         printf("Data: %u\n", m.data);
         printf("Left: %u\n", m.left);
@@ -160,7 +165,6 @@ void *session(void *data)
     // Handling the data sent
     // send_downstream(buff, head);
 
-    free(buff);
     free(head);
     free_chemicals(chems);
     

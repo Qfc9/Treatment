@@ -1,8 +1,8 @@
-make -C pretreatment
-make -C residential
-make -C stormdrain
-make -C treatment
-make -C dummy
+# make -C pretreatment
+# make -C residential
+make debug -C stormdrain
+# make -C treatment
+make debug -C dummy
 
 cp stormdrain/stormdrain mounted/pretreatment/pretreatment
 cp stormdrain/stormdrain mounted/stormdrain/stormdrain

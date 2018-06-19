@@ -11,13 +11,15 @@ struct chemicals* analyze(char *data, uint16_t sz)
 {
     struct chemicals *chems = calloc(1, sizeof(*chems));
     chems->chlorine = NULL;
-    chems->chlorine_max = 0;
     chems->chlorine_sz = 0;
     chems->air_sz = 0;
     chems->air = NULL;
+    chems->total_sz = sz;
     chems->sz = sz;
+    chems->chemicals = data;
 
     chems->chlorine_max = (unsigned int)((sz / 8) * 0.05);
+    chems->chlorine_min = (unsigned int)((sz / 8) * 0.03);
 
     struct molecule m;
     for (uint16_t i = 0; i < (sz / 8); ++i)
@@ -79,13 +81,13 @@ void add_chemical(struct chemical_idx *chems, struct chemical_idx *new_chem)
     return;
 }
 
-void deaerate(char *data, struct chemicals *chems)
+void deaerate(struct chemicals *chems)
 {
     struct chemical_idx *air = chems->air;
 
     while(air)
     {
-        memcpy(&data[air->idx*8], &data[(air->idx + 1)*8], (chems->sz - ((air->idx + 1) * 8)));
+        memcpy(&chems->chemicals[air->idx*8], &chems->chemicals[(air->idx + 1)*8], (chems->sz - ((air->idx + 1) * 8)));
 
         chems->sz -= 8;
         chems->air_sz--;
@@ -94,18 +96,41 @@ void deaerate(char *data, struct chemicals *chems)
     }
 }
 
-void unchlorinate(char *data, struct chemicals *chems)
+void chlorinate(struct chemicals *chems)
 {
-    // struct molecule m;
+    struct molecule chlorine = {2, 1, 1};
 
+    while(chems->chlorine_sz < chems->chlorine_min)
+    {
+        if (chems->sz >= chems->total_sz)
+        {
+            chems->total_sz *= 2;
+            void *tmp = realloc (chems->chemicals, chems->total_sz);
+            if(!tmp)
+            {
+                return;
+            }
+            chems->chemicals = tmp;
+        }
+
+        memcpy(&chems->chemicals[chems->sz], &chlorine, 8);
+        chems->sz += 8;
+        chems->chlorine_sz++;
+
+        printf("ADD CLORINE\n");
+    }
+}
+
+void unchlorinate(struct chemicals *chems)
+{
     struct chemical_idx *chlorine = chems->chlorine;
 
     while(chlorine && (chems->chlorine_sz > chems->chlorine_max))
     {
-        data[(chlorine->idx * 8) + 6] = 0;
-        data[(chlorine->idx * 8) + 7] = 0;
+        chems->chemicals[(chlorine->idx * 8) + 6] = 0;
+        chems->chemicals[(chlorine->idx * 8) + 7] = 0;
         chlorine = chlorine->next;
-        printf("CLORINE\n");
+        printf("TAKE CLORINE\n");
     }
 }
 
@@ -116,6 +141,7 @@ void free_chemicals(struct chemicals *chems)
         return;
     }
     free_chem_idx(chems->chlorine);
+    free(chems->chemicals);
     free(chems);
 }
 
