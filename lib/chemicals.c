@@ -15,11 +15,12 @@ struct chemicals* analyze(char *data, uint16_t sz)
     chems->chlorine_sz = 0;
     chems->air_sz = 0;
     chems->air = NULL;
+    chems->sz = sz;
 
     chems->chlorine_max = (unsigned int)((sz / 8) * 0.05);
 
     struct molecule m;
-    for (uint16_t i = 0; i < sz / 8; ++i)
+    for (uint16_t i = 0; i < (sz / 8); ++i)
     {   
         memcpy(&m, &data[i*8], 8);
 
@@ -78,6 +79,21 @@ void add_chemical(struct chemical_idx *chems, struct chemical_idx *new_chem)
     return;
 }
 
+void deaerate(char *data, struct chemicals *chems)
+{
+    struct chemical_idx *air = chems->air;
+
+    while(air)
+    {
+        memcpy(&data[air->idx*8], &data[(air->idx + 1)*8], (chems->sz - ((air->idx + 1) * 8)));
+
+        chems->sz -= 8;
+        chems->air_sz--;
+        air = air->next;
+        printf("AIR\n");
+    }
+}
+
 void unchlorinate(char *data, struct chemicals *chems)
 {
     // struct molecule m;
@@ -89,7 +105,7 @@ void unchlorinate(char *data, struct chemicals *chems)
         data[(chlorine->idx * 8) + 6] = 0;
         data[(chlorine->idx * 8) + 7] = 0;
         chlorine = chlorine->next;
-        printf("AFSDF\n");
+        printf("CLORINE\n");
     }
 }
 

@@ -134,9 +134,14 @@ void *session(void *data)
         return NULL;
     }
 
-    struct chemicals *chems = analyze(buff, head->size);
-    printf("MAX: %zu, SZ: %zu\n", chems->chlorine_max, chems->chlorine_sz);
+    struct chemicals *chems = analyze(buff, head->size - 8);
+    printf("CL: MAX: %zu, SZ: %zu\n", chems->chlorine_max, chems->chlorine_sz);
+    printf("AIR: SZ: %zu\n", chems->air_sz);
     
+    if (chems->air_sz > 0)
+    {
+        deaerate(buff, chems);
+    }
     if (chems->chlorine_sz > chems->chlorine_max)
     {
         unchlorinate(buff, chems);

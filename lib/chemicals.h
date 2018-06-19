@@ -4,6 +4,7 @@
 
 struct chemicals
 {
+    uint32_t sz;
     uint16_t chlorine_sz;
     uint16_t chlorine_max;
     struct chemical_idx *chlorine;
@@ -20,6 +21,7 @@ struct chemical_idx
 
 struct chemicals* analyze(char *data, uint16_t sz);
 void unchlorinate(char *data, struct chemicals *chems);
+void deaerate(char *data, struct chemicals *chems);
 
 void free_chemicals(struct chemicals *chems);
 
