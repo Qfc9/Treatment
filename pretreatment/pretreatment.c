@@ -1,4 +1,5 @@
 #define _XOPEN_SOURCE 600
+#define _WITH_DPRINTF
 
 #include <signal.h>
 #include <netdb.h>
@@ -7,6 +8,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <pthread.h>
+#include <fcntl.h>
+#include <unistd.h>
 
 #include <arpa/inet.h>
 #include <sys/types.h>
@@ -14,9 +17,10 @@
 
 #include "../lib/listener.h"
 
-
 int main(void)
 {
+    char done[16];
+
     // Thread init
     pthread_t thread;
     pthread_attr_t  attr;
@@ -29,7 +33,7 @@ int main(void)
     // Printing and waiting for an enter to end
     printf("Server Online...\n");
     printf("Press enter to close the server...\n");
-    getc(stdin);
+    scanf("%s", done);
 
     // Killing all the threads
     pthread_kill(thread, SIGINT);

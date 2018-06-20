@@ -38,7 +38,7 @@ void *listener(void *data)
     struct addrinfo *results;
     int err = getaddrinfo(NULL, port, &hints, &results);
     if(err != 0) {
-        fprintf(stderr, "Could not get address: %s\n", gai_strerror(err));
+        // fprintf(stderr, "Could not get address: %s\n", gai_strerror(err));
         return NULL;
     }
 
@@ -92,6 +92,8 @@ void *listener(void *data)
             perror("Could not accept incoming");
             continue;
         }
+
+        printf("MAKING THREAD!\n");
 
         // Mallocing data for every thread
         sData = malloc(sizeof(struct sessionData));

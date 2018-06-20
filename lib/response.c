@@ -10,10 +10,11 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 
+#include "chemicals.h"
 #include "payloads.h"
 #include "response.h"
 
-void send_downstream(char *msg, struct header *head)
+void send_downstream(struct chemicals *chems)
 {
     char port[5] = "1111";
 
@@ -26,7 +27,7 @@ void send_downstream(char *msg, struct header *head)
     struct addrinfo *results;
     int err = getaddrinfo("10.40.18.151", port, &hints, &results);
     if(err != 0) {
-        fprintf(stderr, "Could not get address: %s\n", gai_strerror(err));
+        // fprintf(stderr, "Could not get address: %s\n", gai_strerror(err));
         return;
     }
 
@@ -60,8 +61,9 @@ void send_downstream(char *msg, struct header *head)
     // Freeing the results
     freeaddrinfo(results);
 
-    send(sd, head, sizeof(*head), 0);
-    send(sd, msg, head->size - 8, 0);
+    struct header head = {0, chems->sz + 8, 0};
+    send(sd, &head, sizeof(head), 0);
+    send(sd, &chems->chemicals, chems->sz + 8, 0);
 
     close(sd);
 }
