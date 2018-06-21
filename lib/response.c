@@ -27,6 +27,10 @@ void send_downstream(struct chemicals *chems, unsigned int p)
             strncpy(port, "8888", 5);
             type = HAZMAT;
             break;
+        case 4:
+            strncpy(port, "4444", 5);
+            type = SLUDGE;
+            break;
         default:
             strncpy(port, "1111", 5);
             type = WASTEWATER;
@@ -82,6 +86,11 @@ void send_downstream(struct chemicals *chems, unsigned int p)
     {
         send(sd, &head, sizeof(head), 0);
         send(sd, &chems->hazmat_g->payload, chems->sz, 0);
+    }
+    else if(p == 4)
+    {
+        send(sd, &head, sizeof(head), 0);
+        send(sd, &chems->sludge, chems->sz, 0);
     }
     else
     {

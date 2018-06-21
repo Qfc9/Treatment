@@ -162,6 +162,8 @@ void sludgified(struct chemicals *chems)
         n = n->next;
     }
 
+    chems->sz = size * 64;
+
     chems->sludge = s;
 }
 

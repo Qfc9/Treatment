@@ -166,6 +166,7 @@ void *session(void *data)
         printf("SLUDGE:\n");
         graphPrint(chems->sludge_g);
         sludgified(chems);
+        send_downstream(chems, 4);
     }
 
     printf("SENDING\n");
