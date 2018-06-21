@@ -18,7 +18,7 @@
 void send_downstream(struct chemicals *chems, unsigned int p)
 {
 
-    unsigned int type = 0;
+    unsigned int type;
     char port[5];
 
     switch(p)
@@ -29,6 +29,7 @@ void send_downstream(struct chemicals *chems, unsigned int p)
             break;
         default:
             strncpy(port, "1111", 5);
+            type = WASTEWATER;
 
     }
     // Socket setup

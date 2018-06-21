@@ -8,8 +8,8 @@
 
 extern const char *salt;
 
-enum type {wastewater=0, trash=1, sludge=2, HAZMAT=4, reporting=8};
-enum error_type {RESERVED = 0, not_enough_data=8, illegal_dumping=16};
+enum type {WASTEWATER=0, TRASH=1, SLUDGE=2, HAZMAT=4, REPORTING=8};
+enum error_type {RESERVED = 0, NOT_ENOUGH_DATA=8, ILLEGAL_DUMPING=16};
 
 struct header {
     uint16_t type;

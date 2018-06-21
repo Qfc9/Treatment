@@ -34,6 +34,7 @@ void *listener(void *data)
     struct addrinfo hints = {0};
     hints.ai_socktype = SOCK_STREAM;
     hints.ai_flags = AI_PASSIVE;
+    hints.ai_family = AF_INET;
 
     // Getting socket info
     struct addrinfo *results;
