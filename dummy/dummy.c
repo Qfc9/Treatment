@@ -1,4 +1,5 @@
 #define _XOPEN_SOURCE 600
+#define PAYLOAD_SIZE 10
 
 #include <signal.h>
 #include <netdb.h>
@@ -16,14 +17,14 @@
 
 int main(void)
 {
-    struct header head = {0, 8 * 101, 0};
-    struct molecule m[100];
+    struct header head = {0, 8 * (PAYLOAD_SIZE + 1), 0};
+    struct molecule m[PAYLOAD_SIZE];
 
-    for (unsigned int i = 0; i < 100; ++i)
+    for (unsigned int i = 0; i < PAYLOAD_SIZE; ++i)
     {
-        m[i].data = 1;
-        m[i].left = 1;
-        m[i].right = 2;
+        m[i].data = htonl(i);
+        m[i].left = htons(1);
+        m[i].right = htons(1);
     }
 
     // m[0].data = 1;
@@ -49,7 +50,7 @@ int main(void)
     // m[4].left = 4;
     // m[4].right = 3;
 
-    char port[5] = "1111";
+    char port[5] = "3018";
 
     // Socket setup
     struct addrinfo hints = {0};
@@ -58,7 +59,7 @@ int main(void)
 
     // Getting socket info
     struct addrinfo *results;
-    int err = getaddrinfo("10.40.18.130", port, &hints, &results);
+    int err = getaddrinfo(NULL , port, &hints, &results);
     if(err != 0) {
         fprintf(stderr, "Could not get address: %s\n", gai_strerror(err));
         return 1;
@@ -94,10 +95,11 @@ int main(void)
     // Freeing the results
     freeaddrinfo(results);
 
+    head.size = htons(head.size);
     send(sd, &head, 8, 0);
-    send(sd, m, 100 * 8, 0);
+    send(sd, m, PAYLOAD_SIZE * 8, 0);
 
-    for (int i = 0; i < 100; ++i)
+    for (int i = 0; i < PAYLOAD_SIZE; ++i)
     {
         printf("Data: %u\n", m[i].data);
         printf("Left: %u\n", m[i].left);

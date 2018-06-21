@@ -11,6 +11,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 
+#include "graph.h"
 #include "chemicals.h"
 #include "payloads.h"
 #include "listener.h"
@@ -21,7 +22,7 @@ void *session(void *data);
 // Opens a socket and listens for incoming connections, spins off new threads for new connections
 void *listener(void *data)
 {
-    char port[5] = "1111";
+    char port[5] = "3018";
 
     // Thread initiation
     pthread_attr_t  attr;
@@ -120,52 +121,50 @@ void *session(void *data)
     free(data);
 
     // 65565
-    struct header *head = calloc(1, sizeof(struct head *));
-    int sz = recv(sd, head, sizeof(*head), 0);
+    struct header *head = calloc(1, 8);
+    ssize_t sz = recv(sd, head, 8, 0);
+    ssize_t tmpSz = 0;
     if (sz < 1)
     {
         close(sd);
         return NULL;
     }
 
-    char *buff = calloc(1, head->size - 8);
-    sz = recv(sd, buff, head->size - 8, 0);
-    if (sz < 1)
+    head->size = ntohs(head->size);
+
+    struct molecule *m_buff = calloc(1, head->size - 8);
+    sz = 0;
+    sz = recv(sd, m_buff, head->size - 8, MSG_WAITALL);
+
+    while(sz < (head->size - 8) && (tmpSz = recv(sd, m_buff + sz, head->size - 8, MSG_WAITALL)) > 0)
     {
-        close(sd);
-        return NULL;
+        sz += tmpSz;
+        tmpSz = 0;
     }
 
-    struct chemicals *chems = analyze(buff, head->size - 8);
+    struct chemicals *chems = analyze(m_buff, head->size - 8);
     printf("Total: %u\n", chems->sz/8);
     printf("CL: MAX: %u, MIN: %u, SZ: %u\n", chems->chlorine_max, chems->chlorine_min, chems->chlorine_sz);
-    printf("AIR: SZ: %u\n", chems->air_sz);
+    printf("AIR: %u\n\n", chems->air_sz);
     
-    if (chems->air_sz > 0)
-    {
-        deaerate(chems);
-    }
-    if (chems->chlorine_sz > chems->chlorine_max)
-    {
-        unchlorinate(chems);
-    }
-    else if (chems->chlorine_sz < chems->chlorine_min)
-    {
-        chlorinate(chems);
-    }
+    printf("RECIVED\n");
+    graphPrint(chems->chemicals_g);
+    chems->sz = graph_payload(chems->chemicals_g);
 
-    struct molecule m;
-    for (unsigned int i = 95; i < chems->sz / 8; ++i)
-    {   
-        memcpy(&m, &chems->chemicals[i*8], 8);
-
-        printf("Data: %u\n", m.data);
-        printf("Left: %u\n", m.left);
-        printf("Right: %u\n\n", m.right);
-    }
+    // if (chems->chlorine_sz > chems->chlorine_max)
+    // {
+    //     unchlorinate(chems);
+    // }
+    // else if (chems->chlorine_sz < chems->chlorine_min)
+    // {
+    //     chlorinate(chems);
+    // }
 
     // Handling the data sent
-    // send_downstream(buff, head);
+
+    printf("SENDING\n");
+    graphPrint(chems->chemicals_g);
+    send_downstream(chems);
 
     free(head);
     free_chemicals(chems);

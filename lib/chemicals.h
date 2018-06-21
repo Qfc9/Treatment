@@ -4,7 +4,8 @@
 
 struct chemicals
 {
-    char *chemicals;
+    struct molecule *chemicals;
+    struct _graph *chemicals_g;
     uint32_t total_sz;
     uint32_t sz;
     uint16_t chlorine_sz;
@@ -22,10 +23,9 @@ struct chemical_idx
 };
 
 
-struct chemicals* analyze(char *data, uint16_t sz);
+struct chemicals* analyze(struct molecule *m_buff, uint16_t sz);
 void unchlorinate(struct chemicals *chems);
 void chlorinate(struct chemicals *chems);
-void deaerate(struct chemicals *chems);
 
 void free_chemicals(struct chemicals *chems);
 

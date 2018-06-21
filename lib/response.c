@@ -10,6 +10,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 
+#include "graph.h"
 #include "chemicals.h"
 #include "payloads.h"
 #include "response.h"
@@ -61,9 +62,22 @@ void send_downstream(struct chemicals *chems)
     // Freeing the results
     freeaddrinfo(results);
 
+    printf("SENDING\n");
+    struct molecule m;
+    for (unsigned int i = 0; i < chems->sz / 8; ++i)
+    {   
+        memcpy(&m, &chems->chemicals[i*8], 8);
+        m.data = ntohl(m.data);
+        m.left = ntohs(m.left);
+        m.right = ntohs(m.right);
+
+        printf("%u D: %u, L: %u, R: %u\n", i, m.data, m.left, m.right);
+    }
+
     struct header head = {0, chems->sz + 8, 0};
+    head.size = htons(head.size);
     send(sd, &head, sizeof(head), 0);
-    send(sd, &chems->chemicals, chems->sz + 8, 0);
+    send(sd, &chems->chemicals_g->payload, chems->sz, 0);
 
     close(sd);
 }
