@@ -129,6 +129,55 @@ void graphPrint(graph g)
     _graphPrintNodes(g->nodes);
 }
 
+unsigned int graph_evaluate(struct _node *n)
+{
+    if (!n)
+    {
+        return BST;
+    }
+    
+    if (n->edge_sz >= 2)
+    {
+        return GRAPH;
+    }
+
+    return graph_evaluate(n->next);
+}
+
+void graph_edge_count_deduction(struct _node *n)
+{
+    if (!n)
+    {
+        return;
+    }
+
+    if (n->edges->node)
+    {
+        n->edges->node->edge_sz--;
+    }
+    if (n->edges->next->node)
+    {
+        n->edges->next->node->edge_sz--;
+    }
+
+    graph_edge_count_deduction(n->next);
+}
+
+void graph_add_existing_node(struct _node *n, struct _node *new_n)
+{
+    if (!n)
+    {
+        return;
+    }
+    if (!n->next)
+    {
+        n->next = new_n;
+        return;
+    }
+
+    graph_add_existing_node(n->next, new_n);
+}
+
 // Adding a node to the graph
 void graphAddNode(graph g, uint32_t value)
 {

@@ -15,10 +15,22 @@
 #include "payloads.h"
 #include "response.h"
 
-void send_downstream(struct chemicals *chems)
+void send_downstream(struct chemicals *chems, unsigned int p)
 {
-    char port[5] = "1111";
 
+    unsigned int type = 0;
+    char port[5];
+
+    switch(p)
+    {
+        case 8:
+            strncpy(port, "8888", 5);
+            type = HAZMAT;
+            break;
+        default:
+            strncpy(port, "1111", 5);
+
+    }
     // Socket setup
     struct addrinfo hints = {0};
     hints.ai_socktype = SOCK_STREAM;
@@ -62,10 +74,19 @@ void send_downstream(struct chemicals *chems)
     // Freeing the results
     freeaddrinfo(results);
 
-    struct header head = {0, chems->sz + 8, 0};
+    struct header head = {type, chems->sz + 8, 0};
     head.size = htons(head.size);
-    send(sd, &head, sizeof(head), 0);
-    send(sd, &chems->chemicals_g->payload, chems->sz, 0);
+    head.type = htons(head.type);
+    if (p == 8)
+    {
+        send(sd, &head, sizeof(head), 0);
+        send(sd, &chems->hazmat_g->payload, chems->sz, 0);
+    }
+    else
+    {
+        send(sd, &head, sizeof(head), 0);
+        send(sd, &chems->chemicals_g->payload, chems->sz, 0);
+    }
 
     close(sd);
 }

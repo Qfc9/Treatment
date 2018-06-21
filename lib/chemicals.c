@@ -16,6 +16,7 @@ struct chemicals* analyze(struct molecule *m_buff, uint16_t sz)
     chems->total_sz = sz;
     chems->sz = sz;
     chems->chemicals = m_buff;
+    chems->hazmat_g = graphCreate();
     chems->chemicals_g = graphCreate();
 
     chems->chlorine_max = (unsigned int)((sz / 8) * 0.05);
@@ -97,46 +98,48 @@ void add_chemical(struct chemical_idx *chems, struct chemical_idx *new_chem)
     return;
 }
 
-// void chlorinate(struct chemicals *chems)
-// {
-//     struct molecule chlorine = {2, 1, 1};
-//     printf("ADD CLORINE\n");
+void remove_lead(struct chemicals *chems)
+{
+    struct _node *mov_n = NULL;
+    struct _node *cur_n = chems->chemicals_g->nodes;
+    struct _node *prev_n = NULL;
 
-//     while(chems->chlorine_sz < chems->chlorine_min)
-//     {
-//         if (chems->sz >= chems->total_sz)
-//         {
-//             chems->total_sz *= 2;
-//             void *tmp = realloc (chems->chemicals, chems->total_sz);
-//             if(!tmp)
-//             {
-//                 return;
-//             }
-//             chems->chemicals = tmp;
-//         }
+    while(cur_n)
+    {
+        if (cur_n->edge_sz == 0)
+        {
+            mov_n = cur_n;
+            cur_n = cur_n->next;
+            mov_n->next = NULL;
+            
+            if (!prev_n)
+            {
+                chems->chemicals_g->nodes = cur_n;
+            }
+            else
+            {
+                prev_n->next = cur_n;
+            }
+            
+            if (!chems->hazmat_g->nodes)
+            {
+                chems->hazmat_g->nodes = mov_n;
+            }
+            else
+            {
+                graph_add_existing_node(chems->hazmat_g->nodes, mov_n);
+            }
+        }
+        else
+        {
+            prev_n = cur_n;
+            cur_n = cur_n->next;
+        }
+    }
 
-//         chlorine.data = htonl(chlorine.data);
-//         chlorine.right = htons(chlorine.right);
-//         chlorine.left = htons(chlorine.left);
-//         memcpy(&chems->chemicals[chems->sz], &chlorine, 8);
-//         chems->sz += 8;
-//         chems->chlorine_sz++;
-
-//     }
-// }
-
-// void unchlorinate(struct chemicals *chems)
-// {
-//     struct chemical_idx *chlorine = chems->chlorine;
-//     printf("TAKE CLORINE\n");
-
-//     while(chlorine && (chems->chlorine_sz > chems->chlorine_max))
-//     {
-//         // chems->chemicals[(chlorine->idx * 8) + 6] = 0;
-//         // chems->chemicals[(chlorine->idx * 8) + 7] = 0;
-//         chlorine = chlorine->next;
-//     }
-// }
+    graph_edge_count_deduction(chems->hazmat_g->nodes);
+    chems->chemicals_g->type = graph_evaluate(chems->chemicals_g->nodes);
+}
 
 int lead_detect(struct _node *n)
 {

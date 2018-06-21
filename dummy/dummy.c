@@ -1,5 +1,5 @@
 #define _XOPEN_SOURCE 600
-#define PAYLOAD_SIZE 3
+#define PAYLOAD_SIZE 4
 
 #include <signal.h>
 #include <netdb.h>
@@ -28,7 +28,7 @@ int main(void)
     // }
 
     m[0].data = htonl(974);
-    m[0].left = htons(2);
+    m[0].left = htons(0);
     m[0].right = htons(3);
 
 
@@ -42,13 +42,10 @@ int main(void)
     m[2].right = htons(0);
 
 
-    // m[3].data = 4;
-    // m[3].left = 2;
-    // m[3].right = 2;
+    m[3].data = htonl(55);
+    m[3].left = htons(2);
+    m[3].right = htons(1);
 
-    // m[4].data = 2;
-    // m[4].left = 4;
-    // m[4].right = 3;
 
     char port[5] = "3018";
 

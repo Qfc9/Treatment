@@ -22,7 +22,7 @@ void *session(void *data);
 // Opens a socket and listens for incoming connections, spins off new threads for new connections
 void *listener(void *data)
 {
-    char port[5] = "3018";
+    char port[5] = "1111";
 
     // Thread initiation
     pthread_attr_t  attr;
@@ -149,22 +149,29 @@ void *session(void *data)
     
     printf("RECIVED\n");
     graphPrint(chems->chemicals_g);
-    chems->sz = graph_payload(chems->chemicals_g);
 
-
-    if (chems->chemicals_g->type == GRAPH)
+    while(chems->chemicals_g->type == GRAPH && lead_detect(chems->chemicals_g->nodes))
     {
-        if(lead_detect(chems->chemicals_g->nodes))
-        {
-            printf("\n\nTHERE IS LEAD\n\n");
-        }
+        remove_lead(chems);
+    }
+    if (chems->hazmat_g->nodes)
+    {
+        printf("LEAD:\n");
+        graphPrint(chems->hazmat_g);
     }
 
-    // Handling the data sent
+    if (chems->hazmat_g->nodes)
+    {
+        chems->sz = graph_payload(chems->hazmat_g);
+        send_downstream(chems, 8);
+    }
+
+    chems->sz = graph_payload(chems->chemicals_g);
 
     printf("SENDING\n");
     graphPrint(chems->chemicals_g);
-    send_downstream(chems);
+
+    send_downstream(chems, 1);
 
     free(head);
     free_chemicals(chems);

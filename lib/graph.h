@@ -57,6 +57,9 @@ void graphAddEdge(graph g, uint32_t n1, uint32_t n2);
 bool graphPrintPath(graph g, char **data, size_t sz, char start, char end, size_t search);
 void graphDestroy(graph g);
 
+unsigned int graph_evaluate(struct _node *n);
+void graph_edge_count_deduction(struct _node *n);
+void graph_add_existing_node(struct _node *n, struct _node *new_n);
 uint32_t graph_payload(graph g);
 void graph_size(struct _node *n, uint32_t *size);
 
