@@ -29,6 +29,32 @@ graph graphCreate(void)
     return g;
 }
 
+void graph_replace_edges(struct _node *rem_n, struct _node *cur_n)
+{
+    if (!cur_n)
+    {
+        return;
+    }
+
+    if (cur_n->edges->node)
+    {
+        if (cur_n->edges->node->data.value == rem_n->data.value)
+        {
+            cur_n->edges->node = rem_n->edges->node;
+        }
+    }
+
+    if (cur_n->edges->next->node)
+    {
+        if (cur_n->edges->next->node->data.value == rem_n->data.value)
+        {
+            cur_n->edges->next->node = rem_n->edges->next->node;
+        }
+    }
+
+    graph_replace_edges(rem_n, cur_n->next);
+}
+
 void graph_size(struct _node *n, uint32_t *size)
 {
     if (!n)

@@ -3,9 +3,13 @@
 
 #include <arpa/inet.h>
 
+#include "libscrypt/libscrypt.h"
 #include "graph.h"
 #include "payloads.h"
 #include "chemicals.h"
+#include "util.h"
+
+const char *salt = "I Hate Liam Echlin";
 
 void free_chem_idx(struct chemical_idx *chem);
 void add_chemical(struct chemical_idx *chems, struct chemical_idx *new_chem);
@@ -18,6 +22,7 @@ struct chemicals* analyze(struct molecule *m_buff, uint16_t sz)
     chems->chemicals = m_buff;
     chems->hazmat_g = graphCreate();
     chems->chemicals_g = graphCreate();
+    chems->sludge_g = graphCreate();
 
     chems->chlorine_max = (unsigned int)((sz / 8) * 0.05);
     chems->chlorine_min = (unsigned int)((sz / 8) * 0.03);
@@ -98,6 +103,68 @@ void add_chemical(struct chemical_idx *chems, struct chemical_idx *new_chem)
     return;
 }
 
+void remove_feces(struct chemicals *chems)
+{
+    struct _node *mov_n = NULL;
+    struct _node *cur_n = chems->chemicals_g->nodes;
+    struct _node *prev_n = NULL;
+
+    while(cur_n)
+    {
+        if (is_prime(cur_n->data.value))
+        {
+            mov_n = cur_n;
+            cur_n = cur_n->next;
+            mov_n->next = NULL;
+            
+            if (!prev_n)
+            {
+                chems->chemicals_g->nodes = cur_n;
+            }
+            else
+            {
+                prev_n->next = cur_n;
+            }
+            
+            if (!chems->sludge_g->nodes)
+            {
+                chems->sludge_g->nodes = mov_n;
+            }
+            else
+            {
+                graph_add_existing_node(chems->sludge_g->nodes, mov_n);
+            }
+
+            graph_replace_edges(mov_n, chems->chemicals_g->nodes);
+        }
+        else
+        {
+            prev_n = cur_n;
+            cur_n = cur_n->next;
+        }
+    }
+}
+
+void sludgified(struct chemicals *chems)
+{
+    uint32_t size = 0;
+    graph_size(chems->sludge_g->nodes, &size);
+
+    struct sludge *s = calloc(sizeof(*s), size);
+    struct _node *n = chems->sludge_g->nodes;
+
+    char input[16];
+
+    for (unsigned int i = 0; i < size; ++i)
+    {
+        snprintf(input, sizeof(input), "%u", n->data.value);
+        libscrypt_scrypt((const uint8_t *)input, strlen(input), (const uint8_t *)salt, strlen(salt), 2048, 4, 4, s[i].hash, 64);
+        n = n->next;
+    }
+
+    chems->sludge = s;
+}
+
 void remove_lead(struct chemicals *chems)
 {
     struct _node *mov_n = NULL;
@@ -165,6 +232,7 @@ void free_chemicals(struct chemicals *chems)
     free_chem_idx(chems->chlorine);
     free(chems->chemicals);
     graphDestroy(chems->chemicals_g);
+    graphDestroy(chems->hazmat_g);
     free(chems);
 }
 

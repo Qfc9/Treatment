@@ -22,7 +22,7 @@ void *session(void *data);
 // Opens a socket and listens for incoming connections, spins off new threads for new connections
 void *listener(void *data)
 {
-    char port[5] = "1111";
+    char port[5] = "3018";
 
     // Thread initiation
     pthread_attr_t  attr;
@@ -111,7 +111,7 @@ void *listener(void *data)
 
     }
 
-    return NULL;
+    return data;
 }
 
 // Gets ran for every incoming connection
@@ -146,7 +146,6 @@ void *session(void *data)
     struct chemicals *chems = analyze(m_buff, head->size - 8);
     printf("Total: %u\n", chems->sz/8);
     printf("CL: MAX: %u, MIN: %u, SZ: %u\n", chems->chlorine_max, chems->chlorine_min, chems->chlorine_sz);
-    printf("AIR: %u\n\n", chems->air_sz);
     
     printf("RECIVED\n");
     graphPrint(chems->chemicals_g);
@@ -161,6 +160,15 @@ void *session(void *data)
         graphPrint(chems->hazmat_g);
     }
 
+    remove_feces(chems);
+    if (chems->sludge_g->nodes)
+    {
+        printf("SLUDGE:\n");
+        graphPrint(chems->sludge_g);
+        sludgified(chems);
+    }
+
+    printf("SENDING\n");
     if (chems->hazmat_g->nodes)
     {
         chems->sz = graph_payload(chems->hazmat_g);
@@ -169,7 +177,6 @@ void *session(void *data)
 
     chems->sz = graph_payload(chems->chemicals_g);
 
-    printf("SENDING\n");
     graphPrint(chems->chemicals_g);
 
     send_downstream(chems, 1);
