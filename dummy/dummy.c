@@ -1,5 +1,5 @@
 #define _XOPEN_SOURCE 600
-#define PAYLOAD_SIZE 10
+#define PAYLOAD_SIZE 3
 
 #include <signal.h>
 #include <netdb.h>
@@ -20,26 +20,26 @@ int main(void)
     struct header head = {0, 8 * (PAYLOAD_SIZE + 1), 0};
     struct molecule m[PAYLOAD_SIZE];
 
-    for (unsigned int i = 0; i < PAYLOAD_SIZE; ++i)
-    {
-        m[i].data = htonl(i);
-        m[i].left = htons(1);
-        m[i].right = htons(1);
-    }
+    // for (unsigned int i = 0; i < PAYLOAD_SIZE; ++i)
+    // {
+    //     m[i].data = htonl(i);
+    //     m[i].left = htons(1);
+    //     m[i].right = htons(1);
+    // }
 
-    // m[0].data = 1;
-    // m[0].left = 2;
-    // m[0].right = 0;
-
-
-    // m[1].data = 0;
-    // m[1].left = 1;
-    // m[1].right = 2;
+    m[0].data = htonl(974);
+    m[0].left = htons(2);
+    m[0].right = htons(3);
 
 
-    // m[2].data = 3;
-    // m[2].left = 0;
-    // m[2].right = 0;
+    m[1].data = htonl(22);
+    m[1].left = htons(0);
+    m[1].right = htons(0);
+
+
+    m[2].data = htonl(44);
+    m[2].left = htons(2);
+    m[2].right = htons(0);
 
 
     // m[3].data = 4;

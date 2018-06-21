@@ -151,14 +151,14 @@ void *session(void *data)
     graphPrint(chems->chemicals_g);
     chems->sz = graph_payload(chems->chemicals_g);
 
-    // if (chems->chlorine_sz > chems->chlorine_max)
-    // {
-    //     unchlorinate(chems);
-    // }
-    // else if (chems->chlorine_sz < chems->chlorine_min)
-    // {
-    //     chlorinate(chems);
-    // }
+
+    if (chems->chemicals_g->type == GRAPH)
+    {
+        if(lead_detect(chems->chemicals_g->nodes))
+        {
+            printf("\n\nTHERE IS LEAD\n\n");
+        }
+    }
 
     // Handling the data sent
 

@@ -7,8 +7,11 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
+enum graph_type {BST=0, GRAPH=1};
+
 struct _graph
 {
+    unsigned int type;
     struct _node *nodes;
     struct molecule *payload;
 } _graph;
@@ -23,10 +26,9 @@ struct _data
 
 struct _node
 {
-    size_t edgeCount;
+    size_t edge_sz;
     struct _data data;
     bool visited;
-    size_t weight;
     struct _node *parent;
     struct _edge *edges;
     struct _node *next;
@@ -34,7 +36,6 @@ struct _node
 
 struct _edge
 {
-    size_t weight;
     struct _node *node;
     struct _edge *next;  
 } _edge;

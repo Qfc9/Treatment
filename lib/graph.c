@@ -9,8 +9,6 @@
 #include "payloads.h"
 #include "graph.h"
 
-#define INITWEIGHT 1000000
-
 // Initializing Functions
 static void _graphDestoryNodes(struct _node *n);
 static void _graphDestoryEdges(struct _edge *e);
@@ -26,6 +24,7 @@ graph graphCreate(void)
     graph g = calloc(1, sizeof(*g));
     g->nodes = NULL;
     g->payload = NULL;
+    g->type = BST;
 
     return g;
 }
@@ -147,7 +146,7 @@ void graphAddNode(graph g, uint32_t value)
         }
         g->nodes->data.value = value;
         g->nodes->visited = false;
-        g->nodes->weight = INITWEIGHT;
+        g->nodes->edge_sz = 0;
         g->nodes->parent = NULL;
         return;
     }
@@ -155,7 +154,7 @@ void graphAddNode(graph g, uint32_t value)
     struct _node *newNode = calloc(1, sizeof(_node));
     newNode->data.value = value;
     newNode->visited = false;
-    newNode->weight = INITWEIGHT;
+    newNode->edge_sz = 0;
     newNode->parent = NULL;
 
     struct _node *next = g->nodes;
@@ -183,9 +182,17 @@ void graphAddEdge(graph g, uint32_t n1, uint32_t n2)
         return;
     }
 
+    if (b)
+    {
+        b->edge_sz++;
+        if (b->edge_sz >= 2)
+        {
+            g->type = GRAPH;
+        }
+    }
+
     struct _edge *newEdge = calloc(1, sizeof(*newEdge));
     newEdge->node = b;
-    newEdge->weight = 1;
 
     struct _edge *curEdge = a->edges;
 
@@ -259,7 +266,6 @@ static void _graphResetNodes(struct _node *n)
     }
 
     n->visited = false;
-    n->weight = INITWEIGHT;
     n->parent = NULL;
     _graphResetNodes(n->next);
 }

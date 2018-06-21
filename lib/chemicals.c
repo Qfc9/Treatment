@@ -13,8 +13,6 @@ void add_chemical(struct chemical_idx *chems, struct chemical_idx *new_chem);
 struct chemicals* analyze(struct molecule *m_buff, uint16_t sz)
 {
     struct chemicals *chems = calloc(1, sizeof(*chems));
-    chems->chlorine = NULL;
-    chems->chlorine_sz = 0;
     chems->total_sz = sz;
     chems->sz = sz;
     chems->chemicals = m_buff;
@@ -36,23 +34,6 @@ struct chemicals* analyze(struct molecule *m_buff, uint16_t sz)
         {
             graphAddNode(chems->chemicals_g, m.data);
         }
-
-        if (m.left == m.right && m.left != 0 && m.right != 0 && m.data != 0)
-        {
-            chems->chlorine_sz++;
-            struct chemical_idx *chlorine = calloc(1, sizeof(*chlorine));
-            chlorine->next = NULL;
-            chlorine->idx = m.data;
-
-            if (!chems->chlorine)
-            {
-                chems->chlorine = chlorine;
-            }
-            else
-            {
-                add_chemical(chems->chlorine, chlorine);
-            }
-        }
     }
 
     for (uint16_t i = 0; i < (sz / 8); ++i)
@@ -70,9 +51,7 @@ struct chemicals* analyze(struct molecule *m_buff, uint16_t sz)
         if (m.left != 0)
         {
             mLink = m_buff[(m.left - 1)];
-            mLink.data = ntohl(mLink.data);
-            mLink.left = ntohs(mLink.left);
-            mLink.right = ntohs(mLink.right);
+            mLink.data = ntohl(mLink.data);;
 
             graphAddEdge(chems->chemicals_g, m.data, mLink.data);
         }
@@ -118,45 +97,60 @@ void add_chemical(struct chemical_idx *chems, struct chemical_idx *new_chem)
     return;
 }
 
-void chlorinate(struct chemicals *chems)
+// void chlorinate(struct chemicals *chems)
+// {
+//     struct molecule chlorine = {2, 1, 1};
+//     printf("ADD CLORINE\n");
+
+//     while(chems->chlorine_sz < chems->chlorine_min)
+//     {
+//         if (chems->sz >= chems->total_sz)
+//         {
+//             chems->total_sz *= 2;
+//             void *tmp = realloc (chems->chemicals, chems->total_sz);
+//             if(!tmp)
+//             {
+//                 return;
+//             }
+//             chems->chemicals = tmp;
+//         }
+
+//         chlorine.data = htonl(chlorine.data);
+//         chlorine.right = htons(chlorine.right);
+//         chlorine.left = htons(chlorine.left);
+//         memcpy(&chems->chemicals[chems->sz], &chlorine, 8);
+//         chems->sz += 8;
+//         chems->chlorine_sz++;
+
+//     }
+// }
+
+// void unchlorinate(struct chemicals *chems)
+// {
+//     struct chemical_idx *chlorine = chems->chlorine;
+//     printf("TAKE CLORINE\n");
+
+//     while(chlorine && (chems->chlorine_sz > chems->chlorine_max))
+//     {
+//         // chems->chemicals[(chlorine->idx * 8) + 6] = 0;
+//         // chems->chemicals[(chlorine->idx * 8) + 7] = 0;
+//         chlorine = chlorine->next;
+//     }
+// }
+
+int lead_detect(struct _node *n)
 {
-    struct molecule chlorine = {2, 1, 1};
-    printf("ADD CLORINE\n");
-
-    while(chems->chlorine_sz < chems->chlorine_min)
+    if (!n)
     {
-        if (chems->sz >= chems->total_sz)
-        {
-            chems->total_sz *= 2;
-            void *tmp = realloc (chems->chemicals, chems->total_sz);
-            if(!tmp)
-            {
-                return;
-            }
-            chems->chemicals = tmp;
-        }
-
-        chlorine.data = htonl(chlorine.data);
-        chlorine.right = htons(chlorine.right);
-        chlorine.left = htons(chlorine.left);
-        memcpy(&chems->chemicals[chems->sz], &chlorine, 8);
-        chems->sz += 8;
-        chems->chlorine_sz++;
-
+        return 0;
     }
-}
 
-void unchlorinate(struct chemicals *chems)
-{
-    struct chemical_idx *chlorine = chems->chlorine;
-    printf("TAKE CLORINE\n");
-
-    while(chlorine && (chems->chlorine_sz > chems->chlorine_max))
+    if (n->edge_sz == 0)
     {
-        // chems->chemicals[(chlorine->idx * 8) + 6] = 0;
-        // chems->chemicals[(chlorine->idx * 8) + 7] = 0;
-        chlorine = chlorine->next;
+        return 1;
     }
+
+    return lead_detect(n->next);
 }
 
 void free_chemicals(struct chemicals *chems)

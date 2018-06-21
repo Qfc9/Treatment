@@ -24,8 +24,9 @@ struct chemical_idx
 
 
 struct chemicals* analyze(struct molecule *m_buff, uint16_t sz);
-void unchlorinate(struct chemicals *chems);
-void chlorinate(struct chemicals *chems);
+int lead_detect(struct _node *n);
+// void unchlorinate(struct chemicals *chems);
+// void chlorinate(struct chemicals *chems);
 
 void free_chemicals(struct chemicals *chems);
 
