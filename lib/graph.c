@@ -16,7 +16,6 @@ static struct _node *_graphFindNode(struct _node *n, uint32_t value);
 static void _graphResetNodes(struct _node *n);
 static void _freeStack(struct _stack *s);
 static void _graphResetNodes(struct _node *n);
-static struct _node *_graphFind(struct _node *n, uint32_t value);
 
 // Creating Graph
 graph graphCreate(void)
@@ -92,6 +91,12 @@ void graph_set_payload(struct molecule *m, struct _node *n, uint32_t *idx)
     else
     {
         m[(*idx)].right = htons(n->edges->next->node->data.value);
+    }
+
+    if (n->edges->out_of_bounds || n->edges->next->out_of_bounds)
+    {
+        m[(*idx)].right = 0xFFFF;
+        m[(*idx)].left = 0xFFFF;
     }
 
     (*idx)++;
@@ -268,6 +273,12 @@ void graphAddEdge(graph g, uint32_t n1, uint32_t n2)
 
     struct _edge *newEdge = calloc(1, sizeof(*newEdge));
     newEdge->node = b;
+    newEdge->out_of_bounds = false;
+
+    if (!b && n2 != 0)
+    {
+        newEdge->out_of_bounds = true;
+    }
 
     struct _edge *curEdge = a->edges;
 
@@ -295,7 +306,7 @@ void graphDestroy(graph g)
 }
 
 // Find a certain node
-static struct _node *_graphFind(struct _node *n, uint32_t value)
+struct _node *_graphFind(struct _node *n, uint32_t value)
 {
     if(!n)
     {

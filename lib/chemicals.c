@@ -23,12 +23,47 @@ struct chemicals* analyze(struct molecule *m_buff, uint16_t sz)
     chems->hazmat_g = graphCreate();
     chems->chemicals_g = graphCreate();
     chems->sludge_g = graphCreate();
+    chems->trash_g = graphCreate();
 
     chems->chlorine_max = (unsigned int)((sz / 8) * 0.05);
     chems->chlorine_min = (unsigned int)((sz / 8) * 0.03);
 
+
     struct molecule m;
     struct molecule mLink;
+
+    for (uint16_t i = 0; i < (sz / 8); ++i)
+    {   
+        m = m_buff[i];
+        m.data = ntohl(m.data);
+        m.left = ntohs(m.left);
+        m.right = ntohs(m.right);
+
+        if (m.data == 0)
+        {
+            if (m.left != 0)
+            {
+                for (uint16_t n = 0; n < (sz / 8); ++n)
+                {
+                    if ((ntohs(m_buff[n].left) - 1) == i)
+                    {
+                        m_buff[n].left = m_buff[i].left;
+                    }
+                }
+            }
+            if (m.right != 0)
+            {
+                for (uint16_t n = 0; n < (sz / 8); ++n)
+                {
+                    if ((ntohs(m_buff[n].right) - 1) == i)
+                    {
+                        m_buff[n].right = m_buff[i].right;
+                    }
+                }
+            }
+        }
+    }
+
     for (uint16_t i = 0; i < (sz / 8); ++i)
     {   
         m = m_buff[i];
@@ -51,6 +86,7 @@ struct chemicals* analyze(struct molecule *m_buff, uint16_t sz)
 
         if (m.data == 0)
         {
+            // graph_replace_edges(mov_n, chems->chemicals_g->nodes);
             continue;
         }
 
@@ -103,6 +139,72 @@ void add_chemical(struct chemical_idx *chems, struct chemical_idx *new_chem)
     return;
 }
 
+int trash_detect(struct chemicals *chems)
+{
+    struct _node *cur_n = chems->chemicals_g->nodes;
+
+    while(cur_n)
+    {
+        if ((cur_n->edges->next->node && !_graphFind(chems->chemicals_g->nodes, cur_n->edges->next->node->data.value))
+        || (cur_n->edges->node && !_graphFind(chems->chemicals_g->nodes, cur_n->edges->node->data.value))
+        || cur_n->edges->out_of_bounds || cur_n->edges->next->out_of_bounds)
+        {
+            return 1;
+        }
+
+        cur_n = cur_n->next;
+    }
+
+    return 0;
+}
+
+
+void remove_trash(struct chemicals *chems)
+{
+    struct _node *mov_n = NULL;
+    struct _node *cur_n = chems->chemicals_g->nodes;
+    struct _node *prev_n = NULL;
+
+    while(cur_n)
+    {
+
+        if ((cur_n->edges->next->node && !_graphFind(chems->chemicals_g->nodes, cur_n->edges->next->node->data.value))
+        || (cur_n->edges->node && !_graphFind(chems->chemicals_g->nodes, cur_n->edges->node->data.value))
+        || cur_n->edges->out_of_bounds || cur_n->edges->next->out_of_bounds)
+        {
+            mov_n = cur_n;
+            cur_n = cur_n->next;
+            mov_n->next = NULL;
+            
+            if (!prev_n)
+            {
+                chems->chemicals_g->nodes = cur_n;
+            }
+            else
+            {
+                prev_n->next = cur_n;
+            }
+            
+            if (!chems->trash_g->nodes)
+            {
+                chems->trash_g->nodes = mov_n;
+            }
+            else
+            {
+                graph_add_existing_node(chems->trash_g->nodes, mov_n);
+            }
+
+            graph_edge_count_deduction(mov_n);
+        }
+        else
+        {
+            prev_n = cur_n;
+            cur_n = cur_n->next;
+        }
+    }
+    chems->chemicals_g->type = graph_evaluate(chems->chemicals_g->nodes);
+}
+
 void remove_ammonia(struct chemicals *chems)
 {
     struct _node *mov_n = NULL;
@@ -136,6 +238,7 @@ void remove_ammonia(struct chemicals *chems)
             }
 
             graph_replace_edges(mov_n, chems->chemicals_g->nodes);
+            graph_edge_count_deduction(mov_n);
         }
         else
         {
@@ -143,6 +246,7 @@ void remove_ammonia(struct chemicals *chems)
             cur_n = cur_n->next;
         }
     }
+    chems->chemicals_g->type = graph_evaluate(chems->chemicals_g->nodes);
 }
 
 void remove_feces(struct chemicals *chems)
@@ -178,6 +282,7 @@ void remove_feces(struct chemicals *chems)
             }
 
             graph_replace_edges(mov_n, chems->chemicals_g->nodes);
+            graph_edge_count_deduction(mov_n);
         }
         else
         {
@@ -185,6 +290,7 @@ void remove_feces(struct chemicals *chems)
             cur_n = cur_n->next;
         }
     }
+    chems->chemicals_g->type = graph_evaluate(chems->chemicals_g->nodes);
 }
 
 void sludgified(struct chemicals *chems)
@@ -200,7 +306,7 @@ void sludgified(struct chemicals *chems)
     for (unsigned int i = 0; i < size; ++i)
     {
         snprintf(input, sizeof(input), "%u", n->data.value);
-        libscrypt_scrypt((const uint8_t *)input, strlen(input), (const uint8_t *)salt, strlen(salt), 2048, 4, 4, s[i].hash, 64);
+        libscrypt_scrypt((const uint8_t *)input, strlen(input), (const uint8_t *)salt, strlen(salt), 2048, 4, 4, (uint8_t *) &s[i].hash, 64);
         n = n->next;
     }
 

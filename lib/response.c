@@ -23,17 +23,22 @@ void send_downstream(struct chemicals *chems, unsigned int p)
 
     switch(p)
     {
-        case 8:
-            strncpy(port, "8888", 5);
-            type = HAZMAT;
+        case 2:
+            strncpy(port, "2222", 5);
+            type = TRASH;
             break;
         case 4:
             strncpy(port, "4444", 5);
             type = SLUDGE;
             break;
+        case 8:
+            strncpy(port, "8888", 5);
+            type = HAZMAT;
+            break;
         default:
             strncpy(port, "1111", 5);
             type = WASTEWATER;
+            break;
 
     }
     // Socket setup
@@ -82,20 +87,26 @@ void send_downstream(struct chemicals *chems, unsigned int p)
     struct header head = {type, chems->sz + 8, 0};
     head.size = htons(head.size);
     head.type = htons(head.type);
+    send(sd, &head, sizeof(head), 0);
+
     if (p == 8)
     {
-        send(sd, &head, sizeof(head), 0);
-        send(sd, &chems->hazmat_g->payload, chems->sz, 0);
+        send(sd, chems->hazmat_g->payload, chems->sz, 0);
     }
     else if(p == 4)
     {
-        send(sd, &head, sizeof(head), 0);
-        send(sd, &chems->sludge, chems->sz, 0);
+        for (unsigned int i = 0; i < (chems->sz / 64); ++i)
+        {
+            send(sd, chems->sludge[i].hash, 64, 0);
+        }
+    }
+    else if(p == 2)
+    {
+        send(sd, chems->trash_g->payload, chems->sz, 0);
     }
     else
     {
-        send(sd, &head, sizeof(head), 0);
-        send(sd, &chems->chemicals_g->payload, chems->sz, 0);
+        send(sd, chems->chemicals_g->payload, chems->sz, 0);
     }
 
     close(sd);

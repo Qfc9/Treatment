@@ -19,5 +19,6 @@ struct sessionData
 };
 
 void *listener(void *data);
+void *pretreatment(void *data);
 
 #endif
