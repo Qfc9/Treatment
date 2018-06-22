@@ -161,26 +161,28 @@ void *session(void *data)
     }
 
     remove_feces(chems);
+    remove_ammonia(chems);
+
     if (chems->sludge_g->nodes)
     {
         printf("SLUDGE:\n");
         graphPrint(chems->sludge_g);
         sludgified(chems);
-        send_downstream(chems, 4);
+        // send_downstream(chems, 4);
     }
 
     printf("SENDING\n");
     if (chems->hazmat_g->nodes)
     {
         chems->sz = graph_payload(chems->hazmat_g);
-        send_downstream(chems, 8);
+        // send_downstream(chems, 8);
     }
 
     chems->sz = graph_payload(chems->chemicals_g);
 
     graphPrint(chems->chemicals_g);
 
-    send_downstream(chems, 1);
+    // send_downstream(chems, 1);
 
     free(head);
     free_chemicals(chems);

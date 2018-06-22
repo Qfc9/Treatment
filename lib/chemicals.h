@@ -28,6 +28,7 @@ struct chemicals* analyze(struct molecule *m_buff, uint16_t sz);
 int lead_detect(struct _node *n);
 void remove_feces(struct chemicals *chems);
 void remove_lead(struct chemicals *chems);
+void remove_ammonia(struct chemicals *chems);
 void sludgified(struct chemicals *chems);
 
 void free_chemicals(struct chemicals *chems);

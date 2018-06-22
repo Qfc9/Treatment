@@ -27,7 +27,7 @@ int main(void)
     //     m[i].right = htons(1);
     // }
 
-    m[0].data = htonl(2595747123);
+    m[0].data = htonl(437472615);
     m[0].left = htons(3);
     m[0].right = htons(0);
 

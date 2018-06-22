@@ -4,14 +4,14 @@ make debug -C stormdrain
 # make -C treatment
 make debug -C dummy
 
-cp stormdrain/stormdrain mounted/stormdrain/stormdrain
-cp stormdrain/stormdrain mounted/treatment/treatment
-cp stormdrain/stormdrain mounted/residential/residential
+cp stormdrain/stormdrain mount/stormdrain/stormdrain
+cp stormdrain/stormdrain mount/treatment/treatment
+cp stormdrain/stormdrain mount/residential/residential
 
-cp lib/* mounted/pretreatment/lib
-cp pretreatment/* mounted/pretreatment/source
+# cp lib/* mount/pretreatment/lib
+# cp pretreatment/* mount/pretreatment/source
 
-rm mounted/pretreatment/lib/*.o
-rm mounted/pretreatment/source/*.o
+# rm mount/pretreatment/lib/*.o
+# rm mount/pretreatment/source/*.o
 
 # cp dummy/dummy remote/

@@ -103,6 +103,48 @@ void add_chemical(struct chemical_idx *chems, struct chemical_idx *new_chem)
     return;
 }
 
+void remove_ammonia(struct chemicals *chems)
+{
+    struct _node *mov_n = NULL;
+    struct _node *cur_n = chems->chemicals_g->nodes;
+    struct _node *prev_n = NULL;
+
+    while(cur_n)
+    {
+        if (is_undulating(cur_n->data.value))
+        {
+            mov_n = cur_n;
+            cur_n = cur_n->next;
+            mov_n->next = NULL;
+            
+            if (!prev_n)
+            {
+                chems->chemicals_g->nodes = cur_n;
+            }
+            else
+            {
+                prev_n->next = cur_n;
+            }
+            
+            if (!chems->sludge_g->nodes)
+            {
+                chems->sludge_g->nodes = mov_n;
+            }
+            else
+            {
+                graph_add_existing_node(chems->sludge_g->nodes, mov_n);
+            }
+
+            graph_replace_edges(mov_n, chems->chemicals_g->nodes);
+        }
+        else
+        {
+            prev_n = cur_n;
+            cur_n = cur_n->next;
+        }
+    }
+}
+
 void remove_feces(struct chemicals *chems)
 {
     struct _node *mov_n = NULL;
