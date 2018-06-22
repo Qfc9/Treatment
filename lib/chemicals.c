@@ -3,7 +3,7 @@
 
 #include <arpa/inet.h>
 
-#include "libscrypt/libscrypt.h"
+// #include "libscrypt/libscrypt.h"
 #include "graph.h"
 #include "payloads.h"
 #include "chemicals.h"
@@ -17,13 +17,33 @@ void add_chemical(struct chemical_idx *chems, struct chemical_idx *new_chem);
 struct chemicals* analyze(struct molecule *m_buff, uint16_t sz)
 {
     struct chemicals *chems = calloc(1, sizeof(*chems));
+    if (!chems)
+    {
+        printf("ERROR: chems calloc\n");
+    }
     chems->total_sz = sz;
     chems->sz = sz;
     chems->chemicals = m_buff;
     chems->hazmat_g = graphCreate();
+    if (!chems->hazmat_g)
+    {
+        printf("ERROR: hazmat_g calloc\n");
+    }
     chems->chemicals_g = graphCreate();
+    if (!chems->chemicals_g)
+    {
+        printf("ERROR: chemicals_g calloc\n");
+    }
     chems->sludge_g = graphCreate();
+    if (!chems->sludge_g)
+    {
+        printf("ERROR: sludge_g calloc\n");
+    }
     chems->trash_g = graphCreate();
+    if (!chems->trash_g)
+    {
+        printf("ERROR: trash_g calloc\n");
+    }
 
     chems->chlorine_max = (unsigned int)((sz / 8) * 0.05);
     chems->chlorine_min = (unsigned int)((sz / 8) * 0.03);
@@ -293,27 +313,27 @@ void remove_feces(struct chemicals *chems)
     chems->chemicals_g->type = graph_evaluate(chems->chemicals_g->nodes);
 }
 
-void sludgified(struct chemicals *chems)
-{
-    uint32_t size = 0;
-    graph_size(chems->sludge_g->nodes, &size);
+// void sludgified(struct chemicals *chems)
+// {
+//     uint32_t size = 0;
+//     graph_size(chems->sludge_g->nodes, &size);
 
-    struct sludge *s = calloc(sizeof(*s), size);
-    struct _node *n = chems->sludge_g->nodes;
+//     struct sludge *s = calloc(sizeof(*s), size);
+//     struct _node *n = chems->sludge_g->nodes;
 
-    char input[16];
+//     char input[16];
 
-    for (unsigned int i = 0; i < size; ++i)
-    {
-        snprintf(input, sizeof(input), "%u", n->data.value);
-        libscrypt_scrypt((const uint8_t *)input, strlen(input), (const uint8_t *)salt, strlen(salt), 2048, 4, 4, (uint8_t *) &s[i].hash, 64);
-        n = n->next;
-    }
+//     for (unsigned int i = 0; i < size; ++i)
+//     {
+//         snprintf(input, sizeof(input), "%u", n->data.value);
+//         libscrypt_scrypt((const uint8_t *)input, strlen(input), (const uint8_t *)salt, strlen(salt), 2048, 4, 4, (uint8_t *) &s[i].hash, 64);
+//         n = n->next;
+//     }
 
-    chems->sz = size * 64;
+//     chems->sz = size * 64;
 
-    chems->sludge = s;
-}
+//     chems->sludge = s;
+// }
 
 void remove_lead(struct chemicals *chems)
 {
@@ -346,6 +366,7 @@ void remove_lead(struct chemicals *chems)
             {
                 graph_add_existing_node(chems->hazmat_g->nodes, mov_n);
             }
+            graph_edge_count_deduction(mov_n);
         }
         else
         {
@@ -353,8 +374,6 @@ void remove_lead(struct chemicals *chems)
             cur_n = cur_n->next;
         }
     }
-
-    graph_edge_count_deduction(chems->hazmat_g->nodes);
     chems->chemicals_g->type = graph_evaluate(chems->chemicals_g->nodes);
 }
 

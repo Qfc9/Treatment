@@ -64,6 +64,7 @@ unsigned int graph_evaluate(struct _node *n);
 void graph_edge_count_deduction(struct _node *n);
 void graph_add_existing_node(struct _node *n, struct _node *new_n);
 uint32_t graph_payload(graph g);
+uint32_t graph_payload2(graph g);
 void graph_size(struct _node *n, uint32_t *size);
 
 #endif

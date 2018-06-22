@@ -67,40 +67,62 @@ void graph_size(struct _node *n, uint32_t *size)
     return;
 }
 
-void graph_set_payload(struct molecule *m, struct _node *n, uint32_t *idx)
+uint16_t graph_node_idx(struct _node *n, uint32_t data)
+{
+    if (!n)
+    {
+        return 0;
+    }
+
+    uint16_t idx = 1;
+
+    while(n)
+    {
+        if (n->data.value == data)
+        {
+            return idx;
+        }
+        idx++;
+        n = n->next;
+    }
+
+    return 0;
+}
+
+void graph_set_payload(graph g, struct _node *n, uint32_t *idx)
 {
     if (!n)
     {
         return;
     }
 
-    m[(*idx)].data = htonl(n->data.value);
+     g->payload[(*idx)].data = htonl(n->data.value);
     if (!n->edges->node)
     {
-        m[(*idx)].left = 0;
+        g->payload[(*idx)].left = 0;
     }
     else
     {
-        m[(*idx)].left = htons(n->edges->node->data.value);
+        g->payload[(*idx)].left = htons(graph_node_idx(g->nodes, n->edges->node->data.value));
     }
 
     if (!n->edges->next->node)
     {
-        m[(*idx)].right = 0;
+        g->payload[(*idx)].right = 0;
     }
     else
     {
-        m[(*idx)].right = htons(n->edges->next->node->data.value);
+        g->payload[(*idx)].right = htons(graph_node_idx(g->nodes, n->edges->next->node->data.value));
     }
 
     if (n->edges->out_of_bounds || n->edges->next->out_of_bounds)
     {
-        m[(*idx)].right = 0xFFFF;
-        m[(*idx)].left = 0xFFFF;
+        g->payload[(*idx)].right = 0xFFFF;
+        g->payload[(*idx)].left = 0xFFFF;
     }
 
     (*idx)++;
-    graph_set_payload(m, n->next, idx);
+    graph_set_payload(g, n->next, idx);
 }
 
 uint32_t graph_payload(graph g)
@@ -111,7 +133,7 @@ uint32_t graph_payload(graph g)
 
     g->payload = calloc(8, size);
 
-    graph_set_payload(g->payload, g->nodes, &idx);
+    graph_set_payload(g, g->nodes, &idx);
 
     return size * 8;
 }

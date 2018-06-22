@@ -2,20 +2,10 @@
 #ifndef listeners_H
 #define listeners_H
 
-struct listenerData
-{
-    char *port;
-    char *www;
-    char *cgi;
-    char *err;
-} listenerData;
-
-struct sessionData
+struct session_data
 {
     int sd;
-    char *www;
-    char *cgi;
-    char *err;
+    void *func;
 };
 
 void *listener(void *data);
