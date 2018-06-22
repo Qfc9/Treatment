@@ -17,6 +17,7 @@
 #include "../lib/payloads.h"
 #include "../lib/listener.h"
 #include "../lib/response.h"
+#include "../lib/crypt.h"
 
 void *session(void *data);
 
