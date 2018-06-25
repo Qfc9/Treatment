@@ -97,6 +97,11 @@ void send_downstream(struct chemicals *chems, unsigned int p)
     {
         for (unsigned int i = 0; i < (chems->sz / 64); ++i)
         {
+            for (int n = 0; n < 64; ++n)
+            {
+                printf("%X", chems->sludge[i].hash[n]);
+            }
+            printf("\n");
             send(sd, chems->sludge[i].hash, 64, 0);
         }
     }

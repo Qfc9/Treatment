@@ -89,6 +89,7 @@ void *pretreatment(void *data)
     {
         analyze_hazmat(chems);
     }
+
     while(chems->chemicals_g->type == GRAPH)
     {
         if (chems->hazmat_sz == 1)
@@ -105,15 +106,17 @@ void *pretreatment(void *data)
         }
     }
 
-    printf("SENDING\n");
     if (chems->hazmat_g->nodes)
     {
+        printf("SENDING HAZMAT\n");
         chems->sz = graph_payload(chems->hazmat_g);
+        graphPrint(chems->hazmat_g);
         send_downstream(chems, 8);
     }
 
     if (chems->chemicals_g->nodes)
     {
+        printf("SENDING DOWNSTREAM\n");
         chems->sz = graph_payload(chems->chemicals_g);
         graphPrint(chems->chemicals_g);
         send_treatment(chems);

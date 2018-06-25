@@ -14,7 +14,6 @@ static void _graphDestoryNodes(struct _node *n);
 static void _graphDestoryEdges(struct _edge *e);
 static struct _node *_graphFindNode(struct _node *n, uint32_t value);
 static void _graphResetNodes(struct _node *n);
-static void _freeStack(struct _stack *s);
 static void _graphResetNodes(struct _node *n);
 
 // Creating Graph
@@ -37,17 +36,25 @@ void graph_replace_edges(struct _node *rem_n, struct _node *cur_n)
 
     if (cur_n->edges->node)
     {
-        if (cur_n->edges->node->data.value == rem_n->data.value)
+        if (cur_n->edges->node == rem_n)
         {
             cur_n->edges->node = rem_n->edges->node;
+            if (rem_n->edges->node)
+            {
+                cur_n->edges->node->edge_sz++;
+            }
         }
     }
 
     if (cur_n->edges->next->node)
     {
-        if (cur_n->edges->next->node->data.value == rem_n->data.value)
+        if (cur_n->edges->next->node == rem_n)
         {
             cur_n->edges->next->node = rem_n->edges->next->node;
+            if (cur_n->edges->next->node)
+            {
+                cur_n->edges->next->node->edge_sz++;
+            }
         }
     }
 
@@ -208,8 +215,6 @@ void graph_edge_count_deduction(struct _node *n)
     {
         n->edges->next->node->edge_sz--;
     }
-
-    graph_edge_count_deduction(n->next);
 }
 
 void graph_add_existing_node(struct _node *n, struct _node *new_n)
@@ -355,17 +360,6 @@ struct _node *_graphFind(struct _node *n, uint32_t value)
     }
 
     return _graphFind(n->next, value);
-}
-
-// Freeing a Stack
-static void _freeStack(struct _stack *s)
-{
-    if(!s)
-    {
-        return;
-    }
-    _freeStack(s->next);
-    free(s);
 }
 
 // Settings all nodes to false

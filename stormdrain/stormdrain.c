@@ -129,28 +129,32 @@ void *session(void *data)
         graphPrint(chems->trash_g);
     }
 
-    printf("SENDING\n");
+    chlorine_detect(chems);
 
     if (chems->trash_g->nodes)
     {
+        printf("SENDING TRASH\n");
         chems->sz = graph_payload(chems->trash_g);
         send_downstream(chems, 2);
     }
 
     if (chems->sludge_g->nodes)
     {
+        printf("SENDING SLUDGE\n");
         sludgified(chems);
         send_downstream(chems, 4);
     }
 
     if (chems->hazmat_g->nodes)
     {
+        printf("SENDING HAZMAT\n");
         chems->sz = graph_payload(chems->hazmat_g);
         send_downstream(chems, 8);
     }
 
     if (chems->chemicals_g->nodes)
     {
+        printf("SENDING LIQUID\n");
         chems->sz = graph_payload(chems->chemicals_g);
         graphPrint(chems->chemicals_g);
         send_downstream(chems, 1);
