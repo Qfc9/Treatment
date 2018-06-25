@@ -138,26 +138,7 @@ uint32_t graph_payload(graph g)
     return size * 8;
 }
 
-void _graphPrintEdges(struct _edge *e)
-{
-    if (!e)
-    {
-        return;
-    }
-
-    if (!e->node)
-    {
-        printf("E: 0 ");
-    }
-    else
-    {
-        printf("E: %u ", e->node->data.value);
-    }
-
-    _graphPrintEdges(e->next);
-}
-
-void _graphPrintNodes(struct _node *n)
+void _graph_print_nodes(struct _node *n)
 {
     if (!n)
     {
@@ -165,10 +146,25 @@ void _graphPrintNodes(struct _node *n)
     }
 
     printf("D: %u ", n->data.value);
-    _graphPrintEdges(n->edges);
+    if (n->edges->node)
+    {
+        printf("E: %u ", n->edges->node->data.value);
+    }
+    else
+    {
+        printf("E: 0 ");
+    }
+    if (n->edges->next->node)
+    {
+        printf("E: %u ", n->edges->next->node->data.value);
+    }
+    else
+    {
+        printf("E: 0 ");
+    }
     printf("\n");
 
-    _graphPrintNodes(n->next);
+    _graph_print_nodes(n->next);
 }
 
 // Printing the graph
@@ -179,7 +175,7 @@ void graphPrint(graph g)
         return;
     }
 
-    _graphPrintNodes(g->nodes);
+    _graph_print_nodes(g->nodes);
 }
 
 unsigned int graph_evaluate(struct _node *n)
@@ -268,21 +264,39 @@ void graphAddNode(graph g, uint32_t value)
     next->next = newNode;
 }
 
+struct _node *graph_find_by_idx(graph g, uint32_t idx)
+{
+    struct _node *n = g->nodes;
+
+    if (!n || idx == 0)
+    {
+        return NULL;
+    }
+
+    uint32_t current_pos = 1;
+    while(n)
+    {
+        if(current_pos == idx)
+        {
+            return n;
+        }
+        current_pos++;
+        n = n->next;
+    }
+
+    return NULL;
+}
+
 // Adding an edge to the graph
-void graphAddEdge(graph g, uint32_t n1, uint32_t n2)
+void graph_add_edge(graph g, uint32_t n1_pos, uint32_t n2_pos)
 {
     if(!g || !g->nodes)
     {
         return;
     }
 
-    struct _node *a = _graphFind(g->nodes, n1);
-    struct _node *b = _graphFind(g->nodes, n2);
-
-    if (!a)
-    {
-        return;
-    }
+    struct _node *a = graph_find_by_idx(g, n1_pos);
+    struct _node *b = graph_find_by_idx(g, n2_pos);
 
     if (b)
     {
@@ -297,7 +311,7 @@ void graphAddEdge(graph g, uint32_t n1, uint32_t n2)
     newEdge->node = b;
     newEdge->out_of_bounds = false;
 
-    if (!b && n2 != 0)
+    if (!b && n2_pos != 0)
     {
         newEdge->out_of_bounds = true;
     }

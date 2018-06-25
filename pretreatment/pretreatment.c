@@ -85,14 +85,24 @@ void *pretreatment(void *data)
     printf("RECIVED\n");
     graphPrint(chems->chemicals_g);
 
-    while(chems->chemicals_g->type == GRAPH && lead_detect(chems->chemicals_g->nodes))
+    if (chems->chemicals_g->type == GRAPH)
     {
-        remove_lead(chems);
+        analyze_hazmat(chems);
     }
-    if (chems->hazmat_g->nodes)
+    while(chems->chemicals_g->type == GRAPH)
     {
-        printf("LEAD:\n");
-        graphPrint(chems->hazmat_g);
+        if (chems->hazmat_sz == 1)
+        {
+            remove_lead(chems);
+        }
+        else if (chems->hazmat_sz > 1)
+        {
+            remove_mercury(chems);
+        }
+        else
+        {
+            break;
+        }
     }
 
     printf("SENDING\n");

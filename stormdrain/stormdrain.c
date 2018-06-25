@@ -82,13 +82,30 @@ void *session(void *data)
     printf("RECIVED\n");
     graphPrint(chems->chemicals_g);
 
-    while(chems->chemicals_g->type == GRAPH && lead_detect(chems->chemicals_g->nodes))
+    if (chems->chemicals_g->type == GRAPH)
     {
-        remove_lead(chems);
+        analyze_hazmat(chems);
     }
+
+    while(chems->chemicals_g->type == GRAPH)
+    {
+        if (chems->hazmat_sz == 1)
+        {
+            remove_lead(chems);
+        }
+        else if (chems->hazmat_sz > 1)
+        {
+            remove_mercury(chems);
+        }
+        else
+        {
+            break;
+        }
+    }
+
     if (chems->hazmat_g->nodes)
     {
-        printf("LEAD:\n");
+        printf("HAZMAT:\n");
         graphPrint(chems->hazmat_g);
     }
 
@@ -99,6 +116,9 @@ void *session(void *data)
         printf("SLUDGE:\n");
         graphPrint(chems->sludge_g);
     }
+
+    remove_air(chems);
+
     while(trash_detect(chems))
     {
         remove_trash(chems);

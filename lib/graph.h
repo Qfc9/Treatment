@@ -54,7 +54,7 @@ struct _node;
 graph graphCreate(void);
 void graphAddNode(graph g, uint32_t value);
 void graphPrint(graph g);
-void graphAddEdge(graph g, uint32_t n1, uint32_t n2);
+void graph_add_edge(graph g, uint32_t n1, uint32_t n2);
 bool graphPrintPath(graph g, char **data, size_t sz, char start, char end, size_t search);
 void graphDestroy(graph g);
 
