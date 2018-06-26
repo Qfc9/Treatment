@@ -108,10 +108,13 @@ void send_downstream(struct chemicals *chems, unsigned int p)
     {
         for (unsigned int i = 0; i < (chems->sz / 64); ++i)
         {
+<<<<<<< HEAD
             for (int n = 0; n < 64; ++n)
             {
                 printf("%X", chems->sludge[i].hash[n]);
             }
+=======
+>>>>>>> parent of f69d96f... Fixed up edge deduction on feces and ammonia
             send(sd, chems->sludge[i].hash, 64, 0);
         }
     }

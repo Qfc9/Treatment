@@ -149,6 +149,7 @@ void *session(void *data)
 
         chlorine_detect(chems);
 
+<<<<<<< HEAD
         if (chems->trash_g->nodes)
         {
             printf("SENDING TRASH\n");
@@ -191,6 +192,34 @@ void *session(void *data)
         }
 
     // }
+=======
+    printf("SENDING\n");
+
+    if (chems->trash_g->nodes)
+    {
+        chems->sz = graph_payload(chems->trash_g);
+        send_downstream(chems, 2);
+    }
+
+    if (chems->sludge_g->nodes)
+    {
+        sludgified(chems);
+        send_downstream(chems, 4);
+    }
+
+    if (chems->hazmat_g->nodes)
+    {
+        chems->sz = graph_payload(chems->hazmat_g);
+        send_downstream(chems, 8);
+    }
+
+    if (chems->chemicals_g->nodes)
+    {
+        chems->sz = graph_payload(chems->chemicals_g);
+        graphPrint(chems->chemicals_g);
+        send_downstream(chems, 1);
+    }
+>>>>>>> parent of f69d96f... Fixed up edge deduction on feces and ammonia
 
     // free(addr);
     free(head);

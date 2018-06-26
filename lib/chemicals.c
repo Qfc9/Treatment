@@ -103,6 +103,8 @@ struct chemicals* analyze(struct molecule *m_buff, uint16_t sz)
 
     }
 
+    graph_size(chems->chemicals_g->nodes, &chems->sz);
+
     return chems;
 }
 
@@ -122,38 +124,6 @@ void add_chemical(struct chemical_idx *chems, struct chemical_idx *new_chem)
     add_chemical(chems->next, new_chem);
 
     return;
-}
-
-int chlorine_detect(struct chemicals *chems)
-{
-    chems->sz = 0;
-    graph_size(chems->chemicals_g->nodes, &chems->sz);
-    chems->sz *= 8;
-
-    chems->chlorine_max = (unsigned int)((chems->sz / 8) * 0.05);
-    chems->chlorine_min = (unsigned int)((chems->sz / 8) * 0.03);
-
-    struct _node *n = chems->chemicals_g->nodes;
-
-    while(n)
-    {
-        if (n->edges->node && n->edges->node == n->edges->next->node)
-        {
-            chems->chlorine_sz++;
-        }
-        n = n->next;
-    }
-
-    if (chems->chlorine_sz > chems->chlorine_max)
-    {
-        return 1;
-    }
-    else if (chems->chlorine_sz < chems->chlorine_min && chems->chlorine_min != 0)
-    {
-        return 2;
-    }
-
-    return 0;
 }
 
 int trash_detect(struct chemicals *chems)
@@ -211,6 +181,21 @@ void remove_air(struct chemicals *chems)
                 }
             }
         }
+
+        // if(left_n->edges->node)
+        // {
+        //     if(left_n->edges->node->data.value == 0)
+        //     {
+        //         continue;
+        //     }
+        // }
+        // if(right_n->edges->node)
+        // {
+        //     if(right_n->edges->node->data.value == 0)
+        //     {
+        //         continue;
+        //     }
+        // }
 
         cur_n = cur_n->next;
     }
