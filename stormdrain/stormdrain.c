@@ -132,6 +132,8 @@ void *session(void *data)
         graphPrint(chems->trash_g);
     }
 
+    chlorine_detect(chems);
+
     if (chems->trash_g->nodes)
     {
         printf("SENDING TRASH\n");
