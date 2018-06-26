@@ -76,9 +76,12 @@ void *session(void *data)
     }
 
     struct chemicals *chems = analyze(m_buff, head->size - 8);
-    printf("Total: %u\n", chems->sz/8);
-    printf("CL: MAX: %u, MIN: %u, SZ: %u\n", chems->chlorine_max, chems->chlorine_min, chems->chlorine_sz);
-    
+
+    if ((head->size - 8) != sz)
+    {
+        printf("\nILLEGALL!!!@#@!#!@#!@\n\n");
+    }
+    printf("Total: %u\n", chems->sz/8);    
     printf("RECIVED\n");
     graphPrint(chems->chemicals_g);
 
@@ -128,8 +131,6 @@ void *session(void *data)
         printf("TRASH:\n");
         graphPrint(chems->trash_g);
     }
-
-    // chlorine_detect(chems);
 
     if (chems->trash_g->nodes)
     {
