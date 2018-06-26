@@ -55,7 +55,6 @@ void *pretreatment(void *data)
 {
     // Extracting the data and freeing
     int sd = ((struct session_data *)data)->sd;
-    char *addr = ((struct session_data *)data)->addr;
     free(data);
 
     // 65565
@@ -82,6 +81,10 @@ void *pretreatment(void *data)
 
     struct chemicals *chems = analyze(m_buff, head->size - 8);
 
+    if ((head->size - 8) != sz)
+    {
+        printf("\nILLEGALL!!!@#@!#!@#!@\n\n");
+    }
     printf("Total: %u\n", chems->sz/8);    
     printf("RECIVED\n");
     graphPrint(chems->chemicals_g);
@@ -117,10 +120,10 @@ void *pretreatment(void *data)
 
     if (chems->chemicals_g->nodes)
     {
-        printf("SENDING DOWNSTREAM\n");
+        printf("SENDING LIQUID\n");
         chems->sz = graph_payload(chems->chemicals_g);
         graphPrint(chems->chemicals_g);
-        send_treatment(chems);
+        send_downstream(chems, 1);
     }
 
     free(head);

@@ -124,14 +124,13 @@ void add_chemical(struct chemical_idx *chems, struct chemical_idx *new_chem)
     return;
 }
 
-int chlorine_detect(struct chemicals *chems)
+void chlorine_detect(struct chemicals *chems)
 {
     chems->sz = 0;
     graph_size(chems->chemicals_g->nodes, &chems->sz);
-    chems->sz *= 8;
 
-    chems->chlorine_max = (unsigned int)((chems->sz / 8) * 0.05);
-    chems->chlorine_min = (unsigned int)((chems->sz / 8) * 0.03);
+    chems->chlorine_max = (unsigned int)((chems->sz) * 0.05);
+    chems->chlorine_min = (unsigned int)((chems->sz) * 0.03);
 
     struct _node *n = chems->chemicals_g->nodes;
 
@@ -140,20 +139,15 @@ int chlorine_detect(struct chemicals *chems)
         if (n->edges->node && n->edges->node == n->edges->next->node)
         {
             chems->chlorine_sz++;
+ 
+            if (chems->chlorine_sz > chems->chlorine_max)
+            {
+                n->edges->next->node = NULL;
+                chems->chlorine_sz--;
+            }
         }
         n = n->next;
     }
-
-    if (chems->chlorine_sz > chems->chlorine_max)
-    {
-        return 1;
-    }
-    else if (chems->chlorine_sz < chems->chlorine_min && chems->chlorine_min != 0)
-    {
-        return 2;
-    }
-
-    return 0;
 }
 
 int trash_detect(struct chemicals *chems)

@@ -9,7 +9,9 @@ struct chemicals
     struct _graph *hazmat_g;
     struct _graph *sludge_g;
     struct _graph *trash_g;
-    struct sludge *sludge;
+    struct _graph *chlorine_g;
+    uint8_t *sludge;
+    // struct sludge *sludge;
     struct report *report;
     uint32_t total_sz;
     uint32_t sz;
@@ -29,7 +31,7 @@ struct chemical_idx
 
 struct chemicals* analyze(struct molecule *m_buff, uint16_t sz);
 int lead_detect(struct _node *n);
-int chlorine_detect(struct chemicals *chems);
+void chlorine_detect(struct chemicals *chems);
 void analyze_hazmat(struct chemicals *chems);
 int trash_detect(struct chemicals *chems);
 void remove_feces(struct chemicals *chems);
