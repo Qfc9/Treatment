@@ -136,11 +136,11 @@ void chlorine_detect(struct chemicals *chems)
 
     while(n)
     {
-        if (n->edges->node && n->edges->node == n->edges->next->node)
+        if (n->edges->node != NULL && n->edges->node == n->edges->next->node)
         {
             chems->chlorine_sz++;
  
-            if (chems->chlorine_sz > chems->chlorine_max)
+            if (chems->chlorine_sz >= chems->chlorine_max)
             {
                 n->edges->next->node = NULL;
                 chems->chlorine_sz--;

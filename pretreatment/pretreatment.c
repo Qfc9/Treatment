@@ -123,7 +123,7 @@ void *pretreatment(void *data)
         printf("SENDING LIQUID\n");
         chems->sz = graph_payload(chems->chemicals_g);
         graphPrint(chems->chemicals_g);
-        send_downstream(chems, 1);
+        send_treatment(chems);
     }
 
     free(head);
