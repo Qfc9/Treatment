@@ -83,7 +83,6 @@ void *pretreatment(void *data)
     struct chemicals *chems = analyze(m_buff, head->size - 8);
     if ((head->size - 8) != sz)
     {
-<<<<<<< HEAD
         chems->sz = 64;
         chems->report = calloc(1, 64);
         chems->report->error_type = htons(NOT_ENOUGH_DATA);
@@ -98,11 +97,6 @@ void *pretreatment(void *data)
         send_downstream(chems, 9);
     }
     else
-=======
-        analyze_hazmat(chems);
-    }
-    while(chems->chemicals_g->type == GRAPH)
->>>>>>> parent of f69d96f... Fixed up edge deduction on feces and ammonia
     {
         printf("Total: %u\n", chems->sz/8);    
         printf("RECIVED\n");
@@ -136,7 +130,6 @@ void *pretreatment(void *data)
             graphPrint(chems->hazmat_g);
             send_downstream(chems, 8);
         }
-<<<<<<< HEAD
 
         if (chems->chemicals_g->nodes)
         {
@@ -145,22 +138,6 @@ void *pretreatment(void *data)
             graphPrint(chems->chemicals_g);
             send_treatment(chems);
         }
-=======
-    }
-
-    printf("SENDING\n");
-    if (chems->hazmat_g->nodes)
-    {
-        chems->sz = graph_payload(chems->hazmat_g);
-        send_downstream(chems, 8);
-    }
-
-    if (chems->chemicals_g->nodes)
-    {
-        chems->sz = graph_payload(chems->chemicals_g);
-        graphPrint(chems->chemicals_g);
-        send_treatment(chems);
->>>>>>> parent of f69d96f... Fixed up edge deduction on feces and ammonia
     }
 
     free(head);

@@ -10,7 +10,6 @@
 bool lesser_greater(char *n);
 bool greater_lesser(char *n);
 
-<<<<<<< HEAD
 char *ip_str_to_dec(char *ip_str)
 {
     char *ip_dec = calloc(1, 32);
@@ -21,9 +20,6 @@ char *ip_str_to_dec(char *ip_str)
 }
 
 bool is_undulating(uint32_t n)
-=======
-bool is_undulating(unsigned int n)
->>>>>>> parent of f69d96f... Fixed up edge deduction on feces and ammonia
 {
     char number[16];
     snprintf(number, 16, "%u", n);
@@ -46,15 +42,15 @@ bool greater_lesser(char *n)
 
     for (ssize_t i = 1; i < sz; ++i)
     {
-        if (n[i] == n[i + 1])
+        if (n[i] == n[i - 1])
         {
             return false;
         }
-        else if (n[i] > n[i + 1] && (i % 2 != 0))
+        else if (n[i] > n[i - 1] && (i % 2 != 0))
         {
             return false;
         }
-        else if (n[i] < n[i + 1] && (i % 2 == 0))
+        else if (n[i] < n[i - 1] && (i % 2 == 0))
         {
             return false;
         }
@@ -69,15 +65,15 @@ bool lesser_greater(char *n)
    
     for (ssize_t i = 1; i < sz; ++i)
     {
-        if (n[i] == n[i + 1])
+        if (n[i] == n[i - 1])
         {
             return false;
         }
-        else if (n[i] < n[i + 1] && (i % 2 != 0))
+        else if (n[i] < n[i - 1] && (i % 2 != 0))
         {
             return false;
         }
-        else if (n[i] > n[i + 1] && (i % 2 == 0))
+        else if (n[i] > n[i - 1] && (i % 2 == 0))
         {
             return false;
         }
@@ -86,9 +82,9 @@ bool lesser_greater(char *n)
     return true;
 }
 
-bool is_prime(unsigned int n)
+bool is_prime(uint32_t n)
 {
-    if (n == 0 || n == 1 || (n % 2 == 0))
+    if (n == 0 || n == 1)
     {
         return false;
     }
@@ -96,18 +92,24 @@ bool is_prime(unsigned int n)
     {
         return true;
     }
+    else if(n % 2 == 0)
+    {
+        return false;
+    }
 
     double num = n;
-    double max = floor(sqrt(n));
+    double sqrt_max = floor(sqrt(num));
 
-    for (double i = 1; i <= max; i += 2)
+    uint32_t max = sqrt_max;
+
+    for (uint32_t i = 1; i <= max; i += 2)
     {
-        if (i - 1 < 0.0001)
+        if (i == 1)
         {
             continue;
         }
 
-        if (i / num < 0.0001)
+        if ((n % i) == 0)
         {
             return false;
         }
