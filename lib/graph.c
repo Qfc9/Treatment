@@ -12,7 +12,6 @@
 // Initializing Functions
 static void _graphDestoryNodes(struct _node *n);
 static void _graphDestoryEdges(struct _edge *e);
-static struct _node *_graphFindNode(struct _node *n, uint32_t value);
 static void _graphResetNodes(struct _node *n);
 static void _graphResetNodes(struct _node *n);
 
@@ -384,22 +383,6 @@ static void _graphResetNodes(struct _node *n)
     n->visited = false;
     n->parent = NULL;
     _graphResetNodes(n->next);
-}
-
-// Find a certain node
-static struct _node *_graphFindNode(struct _node *n, uint32_t value)
-{
-    if(!n)
-    {
-        return NULL;
-    }
-
-    if(n->data.value == value)
-    {
-        return n;
-    }
-
-    return _graphFindNode(n->next, value);
 }
 
 // Destroy edges
