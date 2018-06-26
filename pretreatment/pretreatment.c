@@ -83,8 +83,8 @@ void *pretreatment(void *data)
     struct chemicals *chems = analyze(m_buff, head->size - 8);
     if ((head->size - 8) != sz)
     {
-        chems->sz = sizeof(*chems->report);
-        chems->report = calloc(1, sizeof(*chems->report));
+        chems->sz = 64;
+        chems->report = calloc(1, 64);
         chems->report->error_type = htons(NOT_ENOUGH_DATA);
         chems->report->custom = 0;
         chems->report->ip_addr = htonl((*addr));

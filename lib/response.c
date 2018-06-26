@@ -95,16 +95,23 @@ void send_downstream(struct chemicals *chems, unsigned int p)
 
     if (p == 9)
     {
-        send(sd, chems->report, chems->sz, 0);
+        send(sd, chems->report, 8, 0);
+        send(sd, chems->report->message, 56, 0);
     }
     else if (p == 8)
     {
+        printf("\n");
+
         send(sd, chems->hazmat_g->payload, chems->sz, 0);
     }
     else if(p == 4)
     {
         for (unsigned int i = 0; i < (chems->sz / 64); ++i)
         {
+            for (int n = 0; n < 64; ++n)
+            {
+                printf("%X", chems->sludge[i].hash[n]);
+            }
             send(sd, chems->sludge[i].hash, 64, 0);
         }
     }

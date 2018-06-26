@@ -17,6 +17,7 @@ struct chemicals
     uint16_t chlorine_sz;
     uint16_t chlorine_max;
     uint16_t chlorine_min;
+    struct chemical_idx *chlorine;
 };
 
 struct chemical_idx

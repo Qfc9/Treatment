@@ -12,8 +12,8 @@
 #include <sys/socket.h>
 
 #include <sys/stat.h>
-#include <ifaddrs.h>
-#include <netinet/in.h>
+// #include <ifaddrs.h>
+// #include <netinet/in.h>
 
 #include "util.h"
 #include "listener.h"
@@ -94,13 +94,13 @@ void *listener(void *data)
             continue;
         }
 
-        char addr[INET6_ADDRSTRLEN];
+        // char addr[INET6_ADDRSTRLEN];
 
-        if(remote.ss_family == AF_INET6) {
-            inet_ntop(remote.ss_family, &((struct sockaddr_in6 *)&remote)->sin6_addr, addr, sizeof(addr));
-        } else {
-            inet_ntop(remote.ss_family, &((struct sockaddr_in *)&remote)->sin_addr, addr, sizeof(addr));
-        }
+        // if(remote.ss_family == AF_INET6) {
+        //     inet_ntop(remote.ss_family, &((struct sockaddr_in6 *)&remote)->sin6_addr, addr, sizeof(addr));
+        // } else {
+        //     inet_ntop(remote.ss_family, &((struct sockaddr_in *)&remote)->sin_addr, addr, sizeof(addr));
+        // }
 
         printf("MAKING THREAD!\n");
 
@@ -111,9 +111,12 @@ void *listener(void *data)
             perror("Could not malloc");
             continue;
         }
+
+        printf("BEFORE\n");
         s_data->sd = incoming;
         s_data->func = data;
-        s_data->addr = ip_str_to_dec(addr);
+        // s_data->addr = ip_str_to_dec(addr);
+        printf("AFTER\n");
 
         // Creating session threads Thread
         pthread_create(&sessions, &attr, data, s_data);

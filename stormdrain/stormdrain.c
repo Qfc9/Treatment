@@ -49,9 +49,10 @@ int main(void)
 // Gets ran for every incoming connection
 void *session(void *data)
 {
+    printf("SAFE\n");
     // Extracting the data and freeing
     int sd = ((struct session_data *)data)->sd;
-    char *addr = ((struct session_data *)data)->addr;
+    // char *addr = ((struct session_data *)data)->addr;
     free(data);
 
     // 65565
@@ -77,23 +78,24 @@ void *session(void *data)
     }
 
     struct chemicals *chems = analyze(m_buff, head->size - 8);
-    if ((head->size - 8) != sz)
-    {
-        chems->sz = sizeof(*chems->report);
-        chems->report = calloc(1, sizeof(*chems->report));
-        chems->report->error_type = htons(NOT_ENOUGH_DATA);
-        chems->report->custom = 0;
-        chems->report->ip_addr = htonl((*addr));
+    // if ((head->size - 8) != sz)
+    // {
+    //     printf("REPORT!\n");
+    //     chems->sz = 64;
+    //     chems->report = calloc(1, 64);
+    //     chems->report->error_type = htons(NOT_ENOUGH_DATA);
+    //     chems->report->custom = 0;
+    //     chems->report->ip_addr = htonl((*addr));
 
-        sprintf(chems->report->message, "INVALID SIZE FROM: %u.%u.%u.%u", addr[0], addr[8], addr[16], addr[24]);
-        chems->report->message[55] = '\0';
+    //     sprintf(chems->report->message, "INVALID SIZE FROM: %u.%u.%u.%u", addr[0], addr[8], addr[16], addr[24]);
+    //     chems->report->message[55] = '\0';
 
-        printf("%s\n", chems->report->message);
+    //     printf("%s\n", chems->report->message);
 
-        send_downstream(chems, 9);
-    }
-    else
-    {
+    //     send_downstream(chems, 9);
+    // }
+    // else
+    // {
         printf("Total: %u\n", chems->sz/8);
         printf("RECIVED\n");
         graphPrint(chems->chemicals_g);
@@ -151,21 +153,30 @@ void *session(void *data)
         {
             printf("SENDING TRASH\n");
             chems->sz = graph_payload(chems->trash_g);
-            send_downstream(chems, 2);
+            if (chems->sz > 0)
+            {
+                send_downstream(chems, 2);
+            }
         }
 
         if (chems->sludge_g->nodes)
         {
             printf("SENDING SLUDGE\n");
             sludgified(chems);
-            send_downstream(chems, 4);
+            if (chems->sz > 0)
+            {
+                send_downstream(chems, 4);
+            }
         }
 
         if (chems->hazmat_g->nodes)
         {
             printf("SENDING HAZMAT\n");
             chems->sz = graph_payload(chems->hazmat_g);
-            send_downstream(chems, 8);
+            if (chems->sz > 0)
+            {
+                send_downstream(chems, 8);
+            }
         }
 
         if (chems->chemicals_g->nodes)
@@ -173,12 +184,15 @@ void *session(void *data)
             printf("SENDING LIQUID\n");
             chems->sz = graph_payload(chems->chemicals_g);
             graphPrint(chems->chemicals_g);
-            send_downstream(chems, 1);
+            if (chems->sz > 0)
+            {
+                send_downstream(chems, 1);
+            }
         }
 
-    }
+    // }
 
-    free(addr);
+    // free(addr);
     free(head);
     free_chemicals(chems);
     
