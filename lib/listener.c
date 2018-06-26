@@ -10,8 +10,8 @@
 #include <arpa/inet.h>
 #include <sys/types.h>
 #include <sys/socket.h>
-
 #include <sys/stat.h>
+
 // #include <ifaddrs.h>
 // #include <netinet/in.h>
 
@@ -94,6 +94,13 @@ void *listener(void *data)
             continue;
         }
 
+        char *addr = calloc(1, 16);
+
+        if(remote.ss_family == AF_INET) {
+            inet_ntop(remote.ss_family, &((struct sockaddr_in *)&remote)->sin_addr, addr, 16);
+            printf("Received from %s\n", addr);
+        } 
+
         printf("MAKING THREAD!\n");
 
         // Mallocing data for every thread
@@ -105,6 +112,7 @@ void *listener(void *data)
         }
 
         s_data->sd = incoming;
+        s_data->addr = addr;
 
         // Creating session threads Thread
         pthread_create(&sessions, &attr, data, s_data);

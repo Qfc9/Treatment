@@ -14,8 +14,10 @@ char *ip_str_to_dec(char *ip_str)
 {
     char *ip_dec = calloc(1, 32);
 
-    sscanf(ip_str, "%u.%u.%u.%u", (unsigned int *)ip_dec, (unsigned int *)ip_dec+8, (unsigned int *)ip_dec+16, (unsigned int *)ip_dec+24);
-
+    if (ip_str)
+    {
+        sscanf(ip_str, "%u.%u.%u.%u", (unsigned int *)ip_dec, (unsigned int *)ip_dec+8, (unsigned int *)ip_dec+16, (unsigned int *)ip_dec+24);
+    }
     return ip_dec;
 }
 

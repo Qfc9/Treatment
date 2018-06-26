@@ -18,6 +18,7 @@
 #include "../lib/listener.h"
 #include "../lib/response.h"
 #include "../lib/crypt.h"
+#include "../lib/util.h"
 
 void *session(void *data);
 
@@ -51,6 +52,7 @@ void *session(void *data)
 {
     // Extracting the data and freeing
     int sd = ((struct session_data *)data)->sd;
+    char *addr = ((struct session_data *)data)->addr;
     free(data);
 
     // 65565
@@ -79,82 +81,102 @@ void *session(void *data)
 
     if ((head->size - 8) != sz)
     {
-        printf("\nILLEGALL!!!@#@!#!@#!@\n\n");
-    }
-    printf("Total: %u\n", chems->sz/8);    
-    printf("RECIVED\n");
-    graphPrint(chems->chemicals_g);
+        char *dec_addr = ip_str_to_dec(addr);
 
-    if (chems->chemicals_g->type == GRAPH)
-    {
-        analyze_hazmat(chems);
-    }
+        struct report report;
+        report.error_type = htons(NOT_ENOUGH_DATA);
+        report.custom = 0;
+        report.ip_addr = htonl(*dec_addr);
+        free(dec_addr);
 
-    while(chems->chemicals_g->type == GRAPH)
+        snprintf(report.message, 56, "INVALID SIZE FROM: %s", addr);
+        printf("%s\n", report.message);
+
+        chems->sz = 64;
+
+        send_downstream(chems, 9);
+    }
+    else
     {
-        if(remove_hazard(chems) == 1)
+        printf("Total: %u\n", chems->sz/8);    
+        printf("RECIVED\n");
+        graphPrint(chems->chemicals_g);
+
+        if (chems->chemicals_g->type == GRAPH)
         {
-            break;
+            analyze_hazmat(chems);
+        }
+
+        while(chems->chemicals_g->type == GRAPH)
+        {
+            if(remove_hazard(chems) == 1)
+            {
+                break;
+            }
+        }
+
+        if (chems->hazmat_g->nodes)
+        {
+            printf("HAZMAT:\n");
+            graphPrint(chems->hazmat_g);
+        }
+
+        remove_feces(chems);
+        remove_ammonia(chems);
+        if (chems->sludge_g->nodes)
+        {
+            printf("SLUDGE:\n");
+            graphPrint(chems->sludge_g);
+        }
+
+        remove_air(chems);
+
+        while(trash_detect(chems))
+        {
+            remove_trash(chems);
+        }
+        if (chems->trash_g->nodes)
+        {
+            printf("TRASH:\n");
+            graphPrint(chems->trash_g);
+        }
+
+        chlorine_detect(chems);
+
+        if (chems->trash_g->nodes)
+        {
+            printf("SENDING TRASH\n");
+            chems->sz = graph_payload(chems->trash_g);
+            send_downstream(chems, 2);
+        }
+
+        if (chems->sludge_g->nodes)
+        {
+            printf("SENDING SLUDGE\n");
+            sludgified(chems);
+            send_downstream(chems, 4);
+        }
+
+        if (chems->hazmat_g->nodes)
+        {
+            printf("SENDING HAZMAT\n");
+            chems->sz = graph_payload(chems->hazmat_g);
+            send_downstream(chems, 8);
+        }
+
+        if (chems->chemicals_g->nodes)
+        {
+            printf("SENDING LIQUID\n");
+            chems->sz = graph_payload(chems->chemicals_g);
+            graphPrint(chems->chemicals_g);
+            send_downstream(chems, 1);
         }
     }
 
-    if (chems->hazmat_g->nodes)
+    if (addr)
     {
-        printf("HAZMAT:\n");
-        graphPrint(chems->hazmat_g);
+        free(addr);
     }
-
-    remove_feces(chems);
-    remove_ammonia(chems);
-    if (chems->sludge_g->nodes)
-    {
-        printf("SLUDGE:\n");
-        graphPrint(chems->sludge_g);
-    }
-
-    remove_air(chems);
-
-    while(trash_detect(chems))
-    {
-        remove_trash(chems);
-    }
-    if (chems->trash_g->nodes)
-    {
-        printf("TRASH:\n");
-        graphPrint(chems->trash_g);
-    }
-
-    chlorine_detect(chems);
-
-    if (chems->trash_g->nodes)
-    {
-        printf("SENDING TRASH\n");
-        chems->sz = graph_payload(chems->trash_g);
-        send_downstream(chems, 2);
-    }
-
-    if (chems->sludge_g->nodes)
-    {
-        printf("SENDING SLUDGE\n");
-        sludgified(chems);
-        send_downstream(chems, 4);
-    }
-
-    if (chems->hazmat_g->nodes)
-    {
-        printf("SENDING HAZMAT\n");
-        chems->sz = graph_payload(chems->hazmat_g);
-        send_downstream(chems, 8);
-    }
-
-    if (chems->chemicals_g->nodes)
-    {
-        printf("SENDING LIQUID\n");
-        chems->sz = graph_payload(chems->chemicals_g);
-        graphPrint(chems->chemicals_g);
-        send_downstream(chems, 1);
-    }
-
     free(head);
     free_chemicals(chems);
     
