@@ -35,6 +35,10 @@ void send_downstream(struct chemicals *chems, unsigned int p)
             strncpy(port, "8888", 5);
             type = HAZMAT;
             break;
+        case 9:
+            strncpy(port, "9999", 5);
+            type = REPORTING;
+            break;
         default:
             strncpy(port, "1111", 5);
             type = WASTEWATER;
@@ -89,7 +93,11 @@ void send_downstream(struct chemicals *chems, unsigned int p)
     head.type = htons(head.type);
     send(sd, &head, sizeof(head), 0);
 
-    if (p == 8)
+    if (p == 9)
+    {
+        send(sd, chems->report, chems->sz, 0);
+    }
+    else if (p == 8)
     {
         send(sd, chems->hazmat_g->payload, chems->sz, 0);
     }
@@ -97,11 +105,6 @@ void send_downstream(struct chemicals *chems, unsigned int p)
     {
         for (unsigned int i = 0; i < (chems->sz / 64); ++i)
         {
-            for (int n = 0; n < 64; ++n)
-            {
-                printf("%X", chems->sludge[i].hash[n]);
-            }
-            printf("\n");
             send(sd, chems->sludge[i].hash, 64, 0);
         }
     }

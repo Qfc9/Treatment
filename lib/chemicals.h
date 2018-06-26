@@ -10,13 +10,13 @@ struct chemicals
     struct _graph *sludge_g;
     struct _graph *trash_g;
     struct sludge *sludge;
+    struct report *report;
     uint32_t total_sz;
     uint32_t sz;
     uint32_t hazmat_sz;
     uint16_t chlorine_sz;
     uint16_t chlorine_max;
     uint16_t chlorine_min;
-    struct chemical_idx *chlorine;
 };
 
 struct chemical_idx

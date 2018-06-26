@@ -496,7 +496,6 @@ void free_chemicals(struct chemicals *chems)
     {
         return;
     }
-    free_chem_idx(chems->chlorine);
     free(chems->chemicals);
     graphDestroy(chems->chemicals_g);
     graphDestroy(chems->hazmat_g);

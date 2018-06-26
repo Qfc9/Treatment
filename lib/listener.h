@@ -6,6 +6,7 @@ struct session_data
 {
     int sd;
     void *func;
+    char *addr;
 };
 
 void *listener(void *data);
