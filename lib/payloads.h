@@ -38,8 +38,4 @@ struct molecule
     uint16_t right;
 };
 
-struct sludge {
-    uint8_t hash[64];
-};
-
 #endif

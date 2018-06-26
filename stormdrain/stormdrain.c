@@ -92,15 +92,7 @@ void *session(void *data)
 
     while(chems->chemicals_g->type == GRAPH)
     {
-        if (chems->hazmat_sz == 1)
-        {
-            remove_lead(chems);
-        }
-        else if (chems->hazmat_sz > 1)
-        {
-            remove_mercury(chems);
-        }
-        else
+        if(remove_hazard(chems) == 1)
         {
             break;
         }

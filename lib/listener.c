@@ -105,7 +105,6 @@ void *listener(void *data)
         }
 
         s_data->sd = incoming;
-        s_data->func = data;
 
         // Creating session threads Thread
         pthread_create(&sessions, &attr, data, s_data);

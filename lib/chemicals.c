@@ -372,51 +372,6 @@ void remove_feces(struct chemicals *chems)
     chems->chemicals_g->type = graph_evaluate(chems->chemicals_g->nodes);
 }
 
-void remove_lead(struct chemicals *chems)
-{
-    struct _node *mov_n = NULL;
-    struct _node *cur_n = chems->chemicals_g->nodes;
-    struct _node *prev_n = NULL;
-
-    while(cur_n)
-    {
-        if (cur_n->edge_sz == 0 && cur_n->data.value != 0)
-        {
-            mov_n = cur_n;
-            cur_n = cur_n->next;
-            mov_n->next = NULL;
-            
-            if (!prev_n)
-            {
-                chems->chemicals_g->nodes = cur_n;
-            }
-            else
-            {
-                prev_n->next = cur_n;
-            }
-            
-            if (!chems->hazmat_g->nodes)
-            {
-                chems->hazmat_g->nodes = mov_n;
-            }
-            else
-            {
-                graph_add_existing_node(chems->hazmat_g->nodes, mov_n);
-            }
-            graph_edge_count_deduction(mov_n);
-        }
-        else
-        {
-            prev_n = cur_n;
-            cur_n = cur_n->next;
-        }
-    }
-
-    chems->hazmat_sz--;
-
-    chems->chemicals_g->type = graph_evaluate(chems->chemicals_g->nodes);
-}
-
 struct _node *find_lowest_mercury(struct _node *n)
 {
     struct _node *low_n = NULL;
@@ -439,13 +394,17 @@ struct _node *find_lowest_mercury(struct _node *n)
     return low_n;
 }
 
-void remove_mercury(struct chemicals *chems)
+int remove_hazard(struct chemicals *chems)
 {
     struct _node *mov_n = NULL;
     struct _node *cur_n = chems->chemicals_g->nodes;
     struct _node *prev_n = NULL;
 
     mov_n = find_lowest_mercury(chems->chemicals_g->nodes);
+    if (!mov_n)
+    {
+        return 1;
+    }
 
     while(cur_n)
     {
@@ -478,11 +437,10 @@ void remove_mercury(struct chemicals *chems)
         cur_n = cur_n->next;
     }
 
-    chems->hazmat_sz--;
-
     chems->chemicals_g->type = graph_evaluate(chems->chemicals_g->nodes);
-}
 
+    return 0;
+}
 
 void free_chemicals(struct chemicals *chems)
 {

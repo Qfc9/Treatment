@@ -11,7 +11,6 @@ struct chemicals
     struct _graph *trash_g;
     struct _graph *chlorine_g;
     uint8_t *sludge;
-    // struct sludge *sludge;
     struct report *report;
     uint32_t total_sz;
     uint32_t sz;
@@ -35,8 +34,7 @@ void chlorine_detect(struct chemicals *chems);
 void analyze_hazmat(struct chemicals *chems);
 int trash_detect(struct chemicals *chems);
 void remove_feces(struct chemicals *chems);
-void remove_lead(struct chemicals *chems);
-void remove_mercury(struct chemicals *chems);
+int remove_hazard(struct chemicals *chems);
 void remove_ammonia(struct chemicals *chems);
 void remove_air(struct chemicals *chems);
 void remove_trash(struct chemicals *chems);
