@@ -14,9 +14,7 @@ static void _graphDestoryNodes(struct _node *n);
 static void _graphDestoryEdges(struct _edge *e);
 static struct _node *_graphFindNode(struct _node *n, uint32_t value);
 static void _graphResetNodes(struct _node *n);
-static void _freeStack(struct _stack *s);
 static void _graphResetNodes(struct _node *n);
-static struct _node *_graphFind(struct _node *n, uint32_t value);
 
 // Creating Graph
 graph graphCreate(void)
@@ -27,6 +25,40 @@ graph graphCreate(void)
     g->type = BST;
 
     return g;
+}
+
+void graph_replace_edges(struct _node *rem_n, struct _node *cur_n)
+{
+    if (!cur_n)
+    {
+        return;
+    }
+
+    if (cur_n->edges->node)
+    {
+        if (cur_n->edges->node == rem_n)
+        {
+            cur_n->edges->node = rem_n->edges->node;
+            if (rem_n->edges->node)
+            {
+                cur_n->edges->node->edge_sz++;
+            }
+        }
+    }
+
+    if (cur_n->edges->next->node)
+    {
+        if (cur_n->edges->next->node == rem_n)
+        {
+            cur_n->edges->next->node = rem_n->edges->next->node;
+            if (cur_n->edges->next->node)
+            {
+                cur_n->edges->next->node->edge_sz++;
+            }
+        }
+    }
+
+    graph_replace_edges(rem_n, cur_n->next);
 }
 
 void graph_size(struct _node *n, uint32_t *size)
@@ -42,34 +74,62 @@ void graph_size(struct _node *n, uint32_t *size)
     return;
 }
 
-void graph_set_payload(struct molecule *m, struct _node *n, uint32_t *idx)
+uint16_t graph_node_idx(struct _node *n, uint32_t data)
+{
+    if (!n)
+    {
+        return 0;
+    }
+
+    uint16_t idx = 1;
+
+    while(n)
+    {
+        if (n->data.value == data)
+        {
+            return idx;
+        }
+        idx++;
+        n = n->next;
+    }
+
+    return 0;
+}
+
+void graph_set_payload(graph g, struct _node *n, uint32_t *idx)
 {
     if (!n)
     {
         return;
     }
 
-    m[(*idx)].data = htonl(n->data.value);
+     g->payload[(*idx)].data = htonl(n->data.value);
     if (!n->edges->node)
     {
-        m[(*idx)].left = 0;
+        g->payload[(*idx)].left = 0;
     }
     else
     {
-        m[(*idx)].left = htons(n->edges->node->data.value);
+        g->payload[(*idx)].left = htons(graph_node_idx(g->nodes, n->edges->node->data.value));
     }
 
     if (!n->edges->next->node)
     {
-        m[(*idx)].right = 0;
+        g->payload[(*idx)].right = 0;
     }
     else
     {
-        m[(*idx)].right = htons(n->edges->next->node->data.value);
+        g->payload[(*idx)].right = htons(graph_node_idx(g->nodes, n->edges->next->node->data.value));
+    }
+
+    if (n->edges->out_of_bounds || n->edges->next->out_of_bounds)
+    {
+        g->payload[(*idx)].right = 0xFFFF;
+        g->payload[(*idx)].left = 0xFFFF;
     }
 
     (*idx)++;
-    graph_set_payload(m, n->next, idx);
+    graph_set_payload(g, n->next, idx);
 }
 
 uint32_t graph_payload(graph g)
@@ -80,31 +140,12 @@ uint32_t graph_payload(graph g)
 
     g->payload = calloc(8, size);
 
-    graph_set_payload(g->payload, g->nodes, &idx);
+    graph_set_payload(g, g->nodes, &idx);
 
     return size * 8;
 }
 
-void _graphPrintEdges(struct _edge *e)
-{
-    if (!e)
-    {
-        return;
-    }
-
-    if (!e->node)
-    {
-        printf("E: 0 ");
-    }
-    else
-    {
-        printf("E: %u ", e->node->data.value);
-    }
-
-    _graphPrintEdges(e->next);
-}
-
-void _graphPrintNodes(struct _node *n)
+void _graph_print_nodes(struct _node *n)
 {
     if (!n)
     {
@@ -112,10 +153,25 @@ void _graphPrintNodes(struct _node *n)
     }
 
     printf("D: %u ", n->data.value);
-    _graphPrintEdges(n->edges);
+    if (n->edges->node)
+    {
+        printf("E: %u ", n->edges->node->data.value);
+    }
+    else
+    {
+        printf("E: 0 ");
+    }
+    if (n->edges->next->node)
+    {
+        printf("E: %u ", n->edges->next->node->data.value);
+    }
+    else
+    {
+        printf("E: 0 ");
+    }
     printf("\n");
 
-    _graphPrintNodes(n->next);
+    _graph_print_nodes(n->next);
 }
 
 // Printing the graph
@@ -126,7 +182,7 @@ void graphPrint(graph g)
         return;
     }
 
-    _graphPrintNodes(g->nodes);
+    _graph_print_nodes(g->nodes);
 }
 
 unsigned int graph_evaluate(struct _node *n)
@@ -159,8 +215,6 @@ void graph_edge_count_deduction(struct _node *n)
     {
         n->edges->next->node->edge_sz--;
     }
-
-    graph_edge_count_deduction(n->next);
 }
 
 void graph_add_existing_node(struct _node *n, struct _node *new_n)
@@ -215,21 +269,39 @@ void graphAddNode(graph g, uint32_t value)
     next->next = newNode;
 }
 
+struct _node *graph_find_by_idx(graph g, uint32_t idx)
+{
+    struct _node *n = g->nodes;
+
+    if (!n || idx == 0)
+    {
+        return NULL;
+    }
+
+    uint32_t current_pos = 1;
+    while(n)
+    {
+        if(current_pos == idx)
+        {
+            return n;
+        }
+        current_pos++;
+        n = n->next;
+    }
+
+    return NULL;
+}
+
 // Adding an edge to the graph
-void graphAddEdge(graph g, uint32_t n1, uint32_t n2)
+void graph_add_edge(graph g, uint32_t n1_pos, uint32_t n2_pos)
 {
     if(!g || !g->nodes)
     {
         return;
     }
 
-    struct _node *a = _graphFind(g->nodes, n1);
-    struct _node *b = _graphFind(g->nodes, n2);
-
-    if (!a)
-    {
-        return;
-    }
+    struct _node *a = graph_find_by_idx(g, n1_pos);
+    struct _node *b = graph_find_by_idx(g, n2_pos);
 
     if (b)
     {
@@ -242,6 +314,12 @@ void graphAddEdge(graph g, uint32_t n1, uint32_t n2)
 
     struct _edge *newEdge = calloc(1, sizeof(*newEdge));
     newEdge->node = b;
+    newEdge->out_of_bounds = false;
+
+    if (!b && n2_pos != 0)
+    {
+        newEdge->out_of_bounds = true;
+    }
 
     struct _edge *curEdge = a->edges;
 
@@ -269,7 +347,7 @@ void graphDestroy(graph g)
 }
 
 // Find a certain node
-static struct _node *_graphFind(struct _node *n, uint32_t value)
+struct _node *_graphFind(struct _node *n, uint32_t value)
 {
     if(!n)
     {
@@ -282,17 +360,6 @@ static struct _node *_graphFind(struct _node *n, uint32_t value)
     }
 
     return _graphFind(n->next, value);
-}
-
-// Freeing a Stack
-static void _freeStack(struct _stack *s)
-{
-    if(!s)
-    {
-        return;
-    }
-    _freeStack(s->next);
-    free(s);
 }
 
 // Settings all nodes to false

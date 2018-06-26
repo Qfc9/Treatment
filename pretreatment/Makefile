@@ -7,7 +7,7 @@ DEBUG = -DDEBUG -g
 BINS = pretreatment
 
 FILES = pretreatment.o ../lib/listener.o ../lib/payloads.o ../lib/response.o ../lib/chemicals.o ../lib/graph.o
-
+FILES += ../lib/util.o
 all: build
 
 .PHONY: all
