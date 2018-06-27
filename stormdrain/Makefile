@@ -8,7 +8,7 @@ DEBUG = -DDEBUG -g
 BINS = stormdrain
 
 FILES = stormdrain.o ../lib/listener.o ../lib/payloads.o ../lib/response.o ../lib/chemicals.o ../lib/graph.o ../lib/util.o
-FILES += ../lib/crypt.o ../lib/libscrypt/libscrypt.a
+FILES += ../lib/crypt.o ../lib/libscrypt/libscrypt.a ../lib/reporting.o
 all: build
 
 .PHONY: all

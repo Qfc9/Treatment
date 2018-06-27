@@ -95,8 +95,8 @@ void send_downstream(struct chemicals *chems, unsigned int p)
 
     if (p == 9)
     {
-        send(sd, chems->report, 8, 0);
-        send(sd, chems->report->message, 56, 0);
+        send(sd, &chems->report, 8, 0);
+        send(sd, chems->report.message, 56, 0);
     }
     else if (p == 8)
     {

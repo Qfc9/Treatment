@@ -12,11 +12,12 @@ bool greater_lesser(char *n);
 
 char *ip_str_to_dec(char *ip_str)
 {
+
     char *ip_dec = calloc(1, 32);
 
     if (ip_str)
     {
-        sscanf(ip_str, "%u.%u.%u.%u", (unsigned int *)ip_dec, (unsigned int *)ip_dec+8, (unsigned int *)ip_dec+16, (unsigned int *)ip_dec+24);
+        sscanf(ip_dec, "%u.%u.%u.%u", (unsigned int *)ip_str, (unsigned int *)ip_str+8, (unsigned int *)ip_str+16, (unsigned int *)ip_str+24);
     }
     return ip_dec;
 }

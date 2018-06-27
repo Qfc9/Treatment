@@ -12,8 +12,8 @@
 #include <sys/socket.h>
 #include <sys/stat.h>
 
-#include <ifaddrs.h>
-#include <netinet/in.h>
+// #include <ifaddrs.h>
+// #include <netinet/in.h>
 
 #include "util.h"
 #include "listener.h"
@@ -21,7 +21,16 @@
 // Opens a socket and listens for incoming connections, spins off new threads for new connections
 void *listener(void *data)
 {
-    char port[5] = "1111";
+    char port[5];
+
+    if (strncmp("eharmon", getlogin(), 7) == 0)
+    {
+        strncpy(port, "3018", 5);
+    }
+    else
+    {
+        strncpy(port, "1111", 5);
+    }
 
     // Thread initiation
     pthread_attr_t  attr;

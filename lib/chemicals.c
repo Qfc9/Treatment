@@ -1,12 +1,14 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdbool.h>
+#include <unistd.h>
 
 #include <arpa/inet.h>
 
 #include "graph.h"
-#include "payloads.h"
 #include "chemicals.h"
 #include "util.h"
+#include "reporting.h"
 
 const char *salt = "I Hate Liam Echlin";
 
@@ -36,6 +38,7 @@ struct chemicals* analyze(struct molecule *m_buff, uint16_t sz)
     }
     chems->total_sz = sz;
     chems->hazmat_sz = 0;
+    chems->trash_sz = 0;
     chems->sz = sz;
     chems->chemicals = m_buff;
     chems->sludge = NULL;
@@ -58,6 +61,11 @@ struct chemicals* analyze(struct molecule *m_buff, uint16_t sz)
     if (!chems->trash_g)
     {
         printf("ERROR: trash_g calloc\n");
+    }
+    chems->chlorine_g = graphCreate();
+    if (!chems->chlorine_g)
+    {
+        printf("ERROR: chlorine_g calloc\n");
     }
 
     chems->chlorine_max = (unsigned int)((sz / 8) * 0.05);
@@ -167,6 +175,53 @@ int trash_detect(struct chemicals *chems)
     }
 
     return 0;
+}
+
+void illegal_detect(struct chemicals *chems, char *addr)
+{
+    char *username = getlogin();
+    if(strncmp("treat", username, 5) == 0)
+    {
+        return;
+    }
+
+    set_total_sz(chems);
+
+    bool send_report = false;
+    char illegal_items[16] = "";
+    chems->hazmat_sz = 0;
+    chems->trash_sz = 0;
+
+    if(strncmp("residential", username, 5) == 0)
+    {
+        graph_size(chems->trash_g->nodes, &chems->trash_sz);
+
+        if ((chems->total_sz * 0.05) < chems->trash_sz)
+        {
+            strncpy(illegal_items, "TRASH", 6);
+            send_report = true;
+        }
+    }
+
+    graph_size(chems->hazmat_g->nodes, &chems->hazmat_sz);
+
+    if ((chems->total_sz * 0.15) < chems->hazmat_sz)
+    {
+        if (send_report)
+        {
+            strncpy(illegal_items, ", HAZMAT", 9);
+        }
+        else
+        {
+            strncpy(illegal_items, "HAZMAT", 7);
+        }
+        send_report = true;
+    }
+
+    if (send_report)
+    {
+        report_illegal_dumping(chems, addr, illegal_items);
+    }
 }
 
 void remove_air(struct chemicals *chems)
@@ -440,6 +495,16 @@ int remove_hazard(struct chemicals *chems)
     chems->chemicals_g->type = graph_evaluate(chems->chemicals_g->nodes);
 
     return 0;
+}
+
+void set_total_sz(struct chemicals *chems)
+{
+    chems->total_sz = 0;
+    graph_size(chems->chemicals_g->nodes, &chems->total_sz);
+    graph_size(chems->hazmat_g->nodes, &chems->total_sz);
+    graph_size(chems->sludge_g->nodes, &chems->total_sz);
+    graph_size(chems->trash_g->nodes, &chems->total_sz);
+    graph_size(chems->chlorine_g->nodes, &chems->total_sz);
 }
 
 void free_chemicals(struct chemicals *chems)

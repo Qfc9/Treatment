@@ -73,6 +73,22 @@ void graph_size(struct _node *n, uint32_t *size)
     return;
 }
 
+void graph_size_ignore(struct _node *n, uint32_t *size)
+{
+    if (!n)
+    {
+        return;
+    }
+
+    if (n->data.value != 0)
+    {
+        (*size)++;
+    }
+    graph_size(n->next, size);
+
+    return;
+}
+
 uint16_t graph_node_idx(struct _node *n, uint32_t data)
 {
     if (!n)
