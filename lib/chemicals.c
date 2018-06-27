@@ -191,12 +191,19 @@ void illegal_detect(struct chemicals *chems, char *addr)
     char illegal_items[16] = "";
     chems->hazmat_sz = 0;
     chems->trash_sz = 0;
+    graph_size(chems->trash_g->nodes, &chems->trash_sz);
 
     if(strncmp("residential", username, 5) == 0)
     {
-        graph_size(chems->trash_g->nodes, &chems->trash_sz);
-
         if ((chems->total_sz * 0.05) < chems->trash_sz)
+        {
+            strncpy(illegal_items, "TRASH", 6);
+            send_report = true;
+        }
+    }
+    else if(strncmp("stormdrain", username, 5) == 0)
+    {
+        if ((chems->total_sz * 0.8) < chems->trash_sz)
         {
             strncpy(illegal_items, "TRASH", 6);
             send_report = true;

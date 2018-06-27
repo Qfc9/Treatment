@@ -6,6 +6,6 @@
 
 bool is_prime(uint32_t n);
 bool is_undulating(uint32_t n);
-char *ip_str_to_dec(char *ip_str);
+uint32_t *ip_str_to_dec(char *ip_str);
 
 #endif

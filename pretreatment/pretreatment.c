@@ -21,6 +21,7 @@
 #include "../lib/listener.h"
 #include "../lib/response.h"
 #include "../lib/util.h"
+#include "../lib/reporting.h"
 
 void *pretreatment(void *data);
 
@@ -85,20 +86,7 @@ void *pretreatment(void *data)
 
     if ((head->size - 8) != sz)
     {
-        char *dec_addr = ip_str_to_dec(addr);
-
-        struct report report;
-        report.error_type = htons(NOT_ENOUGH_DATA);
-        report.custom = 0;
-        report.ip_addr = htonl(*dec_addr);
-        free(dec_addr);
-
-        snprintf(report.message, 56, "INVALID SIZE FROM: %s", addr);
-        printf("%s\n", report.message);
-
-        chems->sz = 64;
-
-        send_downstream(chems, 9);
+        report_invalid_sz(chems, addr);
     }
     else
     {

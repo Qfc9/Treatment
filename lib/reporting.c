@@ -15,7 +15,7 @@
 
 void report_invalid_sz(struct chemicals *chems, char *addr)
 {
-    char *dec_addr = ip_str_to_dec(addr);
+    uint32_t *dec_addr = ip_str_to_dec(addr);
 
     chems->report.error_type = htons(NOT_ENOUGH_DATA);
     chems->report.custom = 0;
@@ -32,7 +32,7 @@ void report_invalid_sz(struct chemicals *chems, char *addr)
 
 void report_illegal_dumping(struct chemicals *chems, char *addr, char *items)
 {
-    char *dec_addr = ip_str_to_dec(addr);
+    uint32_t *dec_addr = ip_str_to_dec(addr);
 
     chems->report.error_type = htons(ILLEGAL_DUMPING);
     chems->report.custom = 0;

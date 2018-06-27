@@ -10,15 +10,22 @@
 bool lesser_greater(char *n);
 bool greater_lesser(char *n);
 
-char *ip_str_to_dec(char *ip_str)
+uint32_t *ip_str_to_dec(char *ip_str)
 {
+    uint32_t *ip_dec = calloc(1, 32);
 
-    char *ip_dec = calloc(1, 32);
+    unsigned int a = 0;
+    unsigned int b = 0;
+    unsigned int c = 0;
+    unsigned int d = 0;
 
     if (ip_str)
     {
-        sscanf(ip_dec, "%u.%u.%u.%u", (unsigned int *)ip_str, (unsigned int *)ip_str+8, (unsigned int *)ip_str+16, (unsigned int *)ip_str+24);
+        sscanf(ip_str, "%u.%u.%u.%u", &a, &b, &c, &d);
     }
+
+    *ip_dec = (a << 24 | b << 16 | c << 8 | d);
+
     return ip_dec;
 }
 
