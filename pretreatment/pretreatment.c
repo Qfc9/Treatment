@@ -129,7 +129,7 @@ void *pretreatment(void *data)
 
         if (chems->chemicals_g->nodes)
         {
-            printf("SENDING LIQUID\n");
+            printf("SENDING DOWNSTREAM\n");
             chems->sz = graph_payload(chems->chemicals_g);
             graphPrint(chems->chemicals_g);
             send_treatment(chems);

@@ -12,8 +12,8 @@
 #include <sys/socket.h>
 #include <sys/stat.h>
 
-// #include <ifaddrs.h>
-// #include <netinet/in.h>
+#include <ifaddrs.h>
+#include <netinet/in.h>
 
 #include "util.h"
 #include "listener.h"

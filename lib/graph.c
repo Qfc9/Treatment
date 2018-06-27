@@ -206,6 +206,12 @@ void graph_edge_count_deduction(struct _node *n)
         return;
     }
 
+    if (n->edges->node != NULL && n->edges->node == n->edges->next->node)
+    {
+        n->edges->node->edge_sz--;
+        return;
+    }
+
     if (n->edges->node)
     {
         n->edges->node->edge_sz--;
@@ -302,15 +308,6 @@ void graph_add_edge(graph g, uint32_t n1_pos, uint32_t n2_pos)
     struct _node *a = graph_find_by_idx(g, n1_pos);
     struct _node *b = graph_find_by_idx(g, n2_pos);
 
-    if (b)
-    {
-        b->edge_sz++;
-        if (b->edge_sz >= 2)
-        {
-            g->type = GRAPH;
-        }
-    }
-
     struct _edge *newEdge = calloc(1, sizeof(*newEdge));
     newEdge->node = b;
     newEdge->out_of_bounds = false;
@@ -324,8 +321,29 @@ void graph_add_edge(graph g, uint32_t n1_pos, uint32_t n2_pos)
 
     if(!a->edges)
     {
+        if (b)
+        {
+            b->edge_sz++;
+            if (b->edge_sz >= 2)
+            {
+                g->type = GRAPH;
+            }
+        }
         a->edges = newEdge;
         return;
+    }
+
+    if (b)
+    {
+        if (!(curEdge->node != NULL && curEdge->node == newEdge->node))
+        {
+            b->edge_sz++;
+        }
+
+        if (b->edge_sz >= 2)
+        {
+            g->type = GRAPH;
+        }
     }
 
     while(curEdge->next)
