@@ -102,7 +102,7 @@ bool is_prime(uint32_t n)
     {
         return true;
     }
-    else if(n % 2 == 0)
+    if(n % 2 == 0)
     {
         return false;
     }

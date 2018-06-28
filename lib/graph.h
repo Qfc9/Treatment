@@ -12,6 +12,7 @@ enum graph_type {BST=0, GRAPH=1};
 struct _graph
 {
     unsigned int type;
+    unsigned int sz;
     struct _node *nodes;
     struct molecule *payload;
 } _graph;
@@ -26,7 +27,7 @@ struct _data
 
 struct _node
 {
-    size_t edge_sz;
+    size_t edge_inbound;
     struct _data data;
     bool visited;
     struct _node *parent;
@@ -57,6 +58,8 @@ void graphPrint(graph g);
 void graph_add_edge(graph g, uint32_t n1, uint32_t n2);
 bool graphPrintPath(graph g, char **data, size_t sz, char start, char end, size_t search);
 void graphDestroy(graph g);
+
+void graph_mark(struct _node *n_list, struct _node *n);
 
 struct _node *_graphFind(struct _node *n, uint32_t value);
 void graph_replace_edges(struct _node *rem_n, struct _node *cur_n);

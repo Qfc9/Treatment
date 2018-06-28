@@ -1,5 +1,5 @@
 #define _XOPEN_SOURCE 600
-#define PAYLOAD_SIZE 39
+#define PAYLOAD_SIZE 36
 
 #include <signal.h>
 #include <netdb.h>
@@ -26,7 +26,7 @@ int main(void)
     //     m[i].right = htons(1);
     // }
 
-    struct molecule m[PAYLOAD_SIZE] = {
+    struct molecule m[PAYLOAD_SIZE] = 
         // {{htonl(437472611), htons(6), htons(0)},
         // {htonl(2595747122), htons(0), htons(0)},
         // {htonl(3), htons(2), htons(5)},
@@ -35,47 +35,115 @@ int main(void)
         // {htonl(0), htons(2), htons(4)},
         // {htonl(0), htons(3), htons(0)}};
 
-{htonl(2385213943), htons(8), htons(8)},
-{htonl(3418842447), htons(8), htons(8)},
-{htonl(0), htons(0), htons(0)},
-{htonl(0), htons(0), htons(0)},
-{htonl(3908143215), htons(8), htons(8)},
-{htonl(0), htons(0), htons(0)},
-{htonl(0), htons(0), htons(0)},
-{htonl(3874326378), htons(17), htons(17)},
-{htonl(0), htons(0), htons(0)},
-{htonl(0), htons(0), htons(0)},
-{htonl(318917951), htons(0), htons(0)},
-{htonl(4197521027), htons(11), htons(11)},
-{htonl(0), htons(0), htons(0)},
-{htonl(403636815), htons(8), htons(8)},
-{htonl(0), htons(0), htons(0)},
-{htonl(0), htons(0), htons(0)},
-{htonl(2168191014), htons(11), htons(11)},
-{htonl(0), htons(0), htons(0)},
-{htonl(863568468), htons(11), htons(11)},
-{htonl(3308618954), htons(8), htons(8)},
-{htonl(0), htons(0), htons(0)},
-{htonl(4210505040), htons(17), htons(17)},
-{htonl(0), htons(0), htons(0)},
-{htonl(775430040), htons(11), htons(11)},
-{htonl(0), htons(0), htons(0)},
-{htonl(0), htons(0), htons(0)},
-{htonl(0), htons(0), htons(0)},
-{htonl(0), htons(0), htons(0)},
-{htonl(1302008166), htons(17), htons(17)},
-{htonl(3302781086), htons(17), htons(17)},
-{htonl(2168068097), htons(8), htons(8)},
-{htonl(184694182), htons(11), htons(11)},
-{htonl(3498811718), htons(8), htons(8)},
-{htonl(0), htons(0), htons(0)},
-{htonl(0), htons(0), htons(0)},
-{htonl(172063791), htons(8), htons(8)},
-{htonl(0), htons(0), htons(0)},
-{htonl(0), htons(0), htons(0)},
-{htonl(0), htons(0), htons(0)}
+        // {{htonl(55), htons(0), htons(0)},
+        // {htonl(66), htons(0), htons(0)},
+        // {htonl(44), htons(2), htons(2)},
+        // {htonl(22), htons(2), htons(2)},
+        // {htonl(111), htons(6), htons(7)},
+        // {htonl(99), htons(0), htons(0)},
+        // {htonl(88), htons(0), htons(0)},
+        // {htonl(11), htons(2), htons(0)},
+        // {htonl(222), htons(10), htons(0)},
+        // {htonl(122), htons(0), htons(9)}};
 
-// {htonl(158826186), htons(0), htons(0 )},
+{{htonl(0), htons(0), htons(0)},
+{htonl(0), htons(0), htons(0 )},
+{htonl(1322013890), htons(18), htons(18 )},
+{htonl(2612024219), htons(23), htons(26 )},
+{htonl(0), htons(0), htons(0 )},
+{htonl(1734800167), htons(23), htons(26 )},
+{htonl(2799524707), htons(23), htons(26 )},
+{htonl(3279219918), htons(18), htons(18 )},
+{htonl(0), htons(0), htons(0 )},
+{htonl(3289207154), htons(35), htons(35 )},
+{htonl(0), htons(0), htons(0 )},
+{htonl(0), htons(0), htons(0 )},
+{htonl(0), htons(0), htons(0 )},
+{htonl(0), htons(0), htons(0 )},
+{htonl(563406746), htons(18), htons(18 )},
+{htonl(0), htons(0), htons(0 )},
+{htonl(0), htons(0), htons(0 )},
+{htonl(1548470596), htons(34), htons(30 )},
+{htonl(4220059507), htons(18), htons(18 )},
+{htonl(132686211), htons(23), htons(26 )},
+{htonl(0), htons(0), htons(0 )},
+{htonl(501648022), htons(18), htons(18 )},
+{htonl(1401374924), htons(0), htons(26 )},
+{htonl(0), htons(0), htons(0 )},
+{htonl(0), htons(0), htons(0 )},
+{htonl(790833612), htons(0), htons(0 )},
+{htonl(2351821204), htons(18), htons(18 )},
+{htonl(0), htons(0), htons(0 )},
+{htonl(3400526756), htons(23), htons(23 )},
+{htonl(948560901), htons(0), htons(0 )},
+{htonl(0), htons(0), htons(0 )},
+{htonl(0), htons(0), htons(0 )},
+{htonl(0), htons(0), htons(0 )},
+{htonl(2876415217), htons(0), htons(30 )},
+{htonl(3586907719), htons(18), htons(18 )},
+{htonl(1384943430), htons(34), htons(34 )}};
+
+       // {{htonl(0), htons(0), htons(0)},
+       //  {htonl(0), htons(0), htons(1)},
+       //  {htonl(0), htons(2), htons(0)},
+       //  {htonl(2595747120), htons(1), htons(2)}};
+
+       // {{htonl(11), htons(0), htons(0)},
+       //  {htonl(22), htons(0), htons(1)},
+       //  {htonl(33), htons(0), htons(1)},
+       //  {htonl(44), htons(0), htons(0)},
+       //  {htonl(55), htons(0), htons(0)},
+       //  {htonl(2595747120), htons(0), htons(0)}};
+
+       // {
+        // {htonl(33), htons(0), htons(0)},
+        // {htonl(2595747120), htons(0), htons(0)},
+        // {htonl(55), htons(2), htons(0)},
+        // {htonl(30), htons(0), htons(2)},
+        // {htonl(44), htons(0), htons(0)},
+        // {htonl(22), htons(0), htons(0)}};
+
+// {{htonl(2385213943), htons(8), htons(8)},
+// {htonl(3418842447), htons(8), htons(8)},
+// {htonl(0), htons(0), htons(0)},
+// {htonl(0), htons(0), htons(0)},
+// {htonl(3908143215), htons(8), htons(8)},
+// {htonl(0), htons(0), htons(0)},
+// {htonl(0), htons(0), htons(0)},
+// {htonl(3874326378), htons(17), htons(17)},
+// {htonl(0), htons(0), htons(0)},
+// {htonl(0), htons(0), htons(0)},
+// {htonl(318917951), htons(0), htons(0)},
+// {htonl(4197521027), htons(11), htons(11)},
+// {htonl(0), htons(0), htons(0)},
+// {htonl(403636815), htons(8), htons(8)},
+// {htonl(0), htons(0), htons(0)},
+// {htonl(0), htons(0), htons(0)},
+// {htonl(2168191014), htons(11), htons(11)},
+// {htonl(0), htons(0), htons(0)},
+// {htonl(863568468), htons(11), htons(11)},
+// {htonl(3308618954), htons(8), htons(8)},
+// {htonl(0), htons(0), htons(0)},
+// {htonl(4210505040), htons(17), htons(17)},
+// {htonl(0), htons(0), htons(0)},
+// {htonl(775430040), htons(11), htons(11)},
+// {htonl(0), htons(0), htons(0)},
+// {htonl(0), htons(0), htons(0)},
+// {htonl(0), htons(0), htons(0)},
+// {htonl(0), htons(0), htons(0)},
+// {htonl(1302008166), htons(17), htons(17)},
+// {htonl(3302781086), htons(17), htons(17)},
+// {htonl(2168068097), htons(8), htons(8)},
+// {htonl(184694182), htons(11), htons(11)},
+// {htonl(3498811718), htons(8), htons(8)},
+// {htonl(0), htons(0), htons(0)},
+// {htonl(0), htons(0), htons(0)},
+// {htonl(172063791), htons(8), htons(8)},
+// {htonl(0), htons(0), htons(0)},
+// {htonl(0), htons(0), htons(0)},
+// {htonl(0), htons(0), htons(0)}};
+
+// {{htonl(158826186), htons(0), htons(0 )},
 // {htonl(2102341165), htons(7), htons(7 )},
 // {htonl(0), htons(0), htons(0 )},
 // {htonl(2323919844), htons(51), htons(51 )},
@@ -126,8 +194,7 @@ int main(void)
 // {htonl(2030246636), htons(26), htons(26 )},
 // {htonl(0), htons(0), htons(0 )},
 // {htonl(3797359778), htons(7), htons(7 )},
-// {htonl(0), htons(0), htons(0 )}
-};
+// {htonl(0), htons(0), htons(0 )}};
 
     char port[5] = "3018";
 

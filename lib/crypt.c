@@ -33,6 +33,11 @@
 
 void sludgified(struct chemicals *chems)
 {
+    if (!chems->sludge_g->nodes)
+    {
+        return;
+    }
+
     uint32_t size = 0;
     graph_size(chems->sludge_g->nodes, &size);
 
@@ -41,9 +46,9 @@ void sludgified(struct chemicals *chems)
         return;
     }
 
-    chems->sz = size * 64;
+    chems->sludge_g->sz = size * 64;
 
-    uint8_t *hash = calloc(1, chems->sz);
+    uint8_t *hash = calloc(1, chems->sludge_g->sz);
     struct _node *n = chems->sludge_g->nodes;
 
     char input[16];

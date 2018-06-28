@@ -18,33 +18,48 @@
 void send_downstream(struct chemicals *chems, unsigned int p)
 {
 
-    unsigned int type;
+    unsigned int sz;
+    void *payload;
     char port[5];
+    struct header head = {0};
 
     switch(p)
     {
         case 2:
             strncpy(port, "2222", 5);
-            type = TRASH;
+            payload = chems->trash_g->payload;
+            sz = chems->trash_g->sz;
+            head.type = TRASH;
             break;
         case 4:
             strncpy(port, "4444", 5);
-            type = SLUDGE;
+            payload = chems->sludge;
+            sz = chems->sludge_g->sz;
+            head.type = SLUDGE;
             break;
         case 8:
             strncpy(port, "8888", 5);
-            type = HAZMAT;
+            payload = chems->hazmat_g->payload;
+            sz = chems->hazmat_g->sz;
+            head.type = HAZMAT;
             break;
         case 9:
             strncpy(port, "9999", 5);
-            type = REPORTING;
+            payload = NULL;
+            sz = 64;
+            head.type = REPORTING;
             break;
         default:
             strncpy(port, "1111", 5);
-            type = WASTEWATER;
+            payload = chems->liquid_g->payload;
+            sz = chems->liquid_g->sz;
+            head.type = WASTEWATER;
             break;
-
     }
+
+    head.size = htons(sz + 8);
+    head.type = htons(head.type);
+
     // Socket setup
     struct addrinfo hints = {0};
     hints.ai_socktype = SOCK_STREAM;
@@ -88,37 +103,15 @@ void send_downstream(struct chemicals *chems, unsigned int p)
     // Freeing the results
     freeaddrinfo(results);
 
-    struct header head = {type, chems->sz + 8, 0};
-    head.size = htons(head.size);
-    head.type = htons(head.type);
     send(sd, &head, sizeof(head), 0);
-
-    if (p == 9)
+    if (payload)
     {
-        send(sd, &chems->report, 8, 0);
-        send(sd, chems->report.message, 56, 0);
-    }
-    else if (p == 8)
-    {
-        printf("\n");
-
-        send(sd, chems->hazmat_g->payload, chems->sz, 0);
-    }
-    else if(p == 4)
-    {
-        send(sd, chems->sludge, chems->sz, 0);
-        // for (unsigned int i = 0; i < (chems->sz / 64); ++i)
-        // {
-        //     send(sd, chems->sludge[i].hash, 64, 0);
-        // }
-    }
-    else if(p == 2)
-    {
-        send(sd, chems->trash_g->payload, chems->sz, 0);
+        send(sd, payload, sz, 0);
     }
     else
     {
-        send(sd, chems->chemicals_g->payload, chems->sz, 0);
+        send(sd, &chems->report, 8, 0);
+        send(sd, chems->report.message, 56, 0);
     }
 
     close(sd);
@@ -172,16 +165,10 @@ void send_treatment(struct chemicals *chems)
     // Freeing the results
     freeaddrinfo(results);
 
-    struct header head = {0, chems->sz + 8, 0};
+    struct header head = {0, chems->liquid_g->sz + 8, 0};
     head.size = htons(head.size);
     send(sd, &head, sizeof(head), 0);
-    send(sd, chems->chemicals_g->payload, chems->sz, 0);
-
-    // printf("%u\n", chems->sz/8);
-    // for (int i = 0; i < chems->sz/8; ++i)
-    // {
-    //     printf("D:%u L:%u R:%u\n", chems->chemicals_g->payload[i].data, chems->chemicals_g->payload[i].left, chems->chemicals_g->payload[i].right);
-    // }
+    send(sd, chems->liquid_g->payload, chems->liquid_g->sz, 0);
 
     close(sd);  
 }

@@ -26,6 +26,62 @@ graph graphCreate(void)
     return g;
 }
 
+void graph_mark_edges(struct _node *n)
+{
+    if(!n)
+    {
+        return;
+    }
+
+    if (n->edges->node && !n->edges->node->visited)
+    {
+        n->edges->node->visited = true;
+        graph_mark_edges(n->edges->node);
+    }
+    if (n->edges->next->node && !n->edges->next->node->visited)
+    {
+        n->edges->next->node->visited = true;
+        graph_mark_edges(n->edges->next->node);
+    } 
+
+}
+
+void graph_mark(struct _node *n_list, struct _node *n)
+{
+    if (!n_list)
+    {
+        return;
+    }
+
+    if (n_list != n)
+    {
+        if (n_list->edges->node)
+        {
+            if (n_list->edges->node == n || n_list->edges->node->visited)
+            {
+                n_list->visited = true;
+                graph_mark_edges(n_list->edges->node);
+            }
+
+        }
+        else if (n_list->edges->next->node)
+        {
+            if (n_list->edges->next->node == n || n_list->edges->next->node->visited)
+            {
+                n_list->visited = true;
+                graph_mark_edges(n_list->edges->next->node);
+            }
+        } 
+    }
+    else
+    {
+        graph_mark_edges(n_list);
+    }
+
+    graph_mark(n_list->next, n);
+
+}
+
 void graph_replace_edges(struct _node *rem_n, struct _node *cur_n)
 {
     if (!cur_n)
@@ -40,7 +96,7 @@ void graph_replace_edges(struct _node *rem_n, struct _node *cur_n)
             cur_n->edges->node = rem_n->edges->node;
             if (rem_n->edges->node)
             {
-                cur_n->edges->node->edge_sz++;
+                cur_n->edges->node->edge_inbound++;
             }
         }
     }
@@ -52,7 +108,7 @@ void graph_replace_edges(struct _node *rem_n, struct _node *cur_n)
             cur_n->edges->next->node = rem_n->edges->next->node;
             if (cur_n->edges->next->node)
             {
-                cur_n->edges->next->node->edge_sz++;
+                cur_n->edges->next->node->edge_inbound++;
             }
         }
     }
@@ -149,6 +205,11 @@ void graph_set_payload(graph g, struct _node *n, uint32_t *idx)
 
 uint32_t graph_payload(graph g)
 {
+    if (!g->nodes)
+    {
+        return 0;
+    }
+
     uint32_t size = 0;
     uint32_t idx = 0;
     graph_size(g->nodes, &size);
@@ -156,6 +217,8 @@ uint32_t graph_payload(graph g)
     g->payload = calloc(8, size);
 
     graph_set_payload(g, g->nodes, &idx);
+
+    g->sz = size * 8;
 
     return size * 8;
 }
@@ -207,7 +270,7 @@ unsigned int graph_evaluate(struct _node *n)
         return BST;
     }
     
-    if (n->edge_sz >= 2)
+    if (n->edge_inbound >= 2)
     {
         return GRAPH;
     }
@@ -224,17 +287,17 @@ void graph_edge_count_deduction(struct _node *n)
 
     if (n->edges->node != NULL && n->edges->node == n->edges->next->node)
     {
-        n->edges->node->edge_sz--;
+        n->edges->node->edge_inbound--;
         return;
     }
 
     if (n->edges->node)
     {
-        n->edges->node->edge_sz--;
+        n->edges->node->edge_inbound--;
     }
     if (n->edges->next->node)
     {
-        n->edges->next->node->edge_sz--;
+        n->edges->next->node->edge_inbound--;
     }
 }
 
@@ -270,7 +333,7 @@ void graphAddNode(graph g, uint32_t value)
         }
         g->nodes->data.value = value;
         g->nodes->visited = false;
-        g->nodes->edge_sz = 0;
+        g->nodes->edge_inbound = 0;
         g->nodes->parent = NULL;
         return;
     }
@@ -278,7 +341,7 @@ void graphAddNode(graph g, uint32_t value)
     struct _node *newNode = calloc(1, sizeof(_node));
     newNode->data.value = value;
     newNode->visited = false;
-    newNode->edge_sz = 0;
+    newNode->edge_inbound = 0;
     newNode->parent = NULL;
 
     struct _node *next = g->nodes;
@@ -328,7 +391,7 @@ void graph_add_edge(graph g, uint32_t n1_pos, uint32_t n2_pos)
     newEdge->node = b;
     newEdge->out_of_bounds = false;
 
-    if (!b && n2_pos != 0)
+    if (n2_pos > g->sz/8)
     {
         newEdge->out_of_bounds = true;
     }
@@ -339,11 +402,7 @@ void graph_add_edge(graph g, uint32_t n1_pos, uint32_t n2_pos)
     {
         if (b)
         {
-            b->edge_sz++;
-            if (b->edge_sz >= 2)
-            {
-                g->type = GRAPH;
-            }
+            b->edge_inbound++;
         }
         a->edges = newEdge;
         return;
@@ -353,12 +412,7 @@ void graph_add_edge(graph g, uint32_t n1_pos, uint32_t n2_pos)
     {
         if (!(curEdge->node != NULL && curEdge->node == newEdge->node))
         {
-            b->edge_sz++;
-        }
-
-        if (b->edge_sz >= 2)
-        {
-            g->type = GRAPH;
+            b->edge_inbound++;
         }
     }
 
