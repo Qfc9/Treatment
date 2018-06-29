@@ -26,7 +26,6 @@ struct chemicals* create_chemicals(struct molecule *m_buff, uint16_t sz)
     chems->hazmat_sz = 0;
     chems->trash_sz = 0;
     chems->sz = sz;
-    chems->chemicals = m_buff;
     chems->sludge = NULL;
     chems->chlorine_max = 0;
     chems->chlorine_min = 0;
@@ -150,8 +149,11 @@ void break_up_compounds(struct chemicals *chems)
 
         cur_n->visited = true;
         sz = 0;
-        graph_mark(cur_n, cur_n);
-        graph_mark(cur_n, cur_n);
+
+        for (unsigned int i = 0; i < chems->chemicals_sz; ++i)
+        {
+            graph_mark(cur_n, cur_n);
+        }
 
         while(cur_n)
         {
@@ -248,25 +250,6 @@ void chlorine_detect(struct chemicals *chems)
     }
 }
 
-int trash_detect(struct chemicals *chems)
-{
-    struct _node *cur_n = chems->chemicals_cur->nodes;
-
-    while(cur_n)
-    {
-        if ((cur_n->edges->next->node && !_graphFind(chems->chemicals_cur->nodes, cur_n->edges->next->node->data.value))
-        || (cur_n->edges->node && !_graphFind(chems->chemicals_cur->nodes, cur_n->edges->node->data.value))
-        || cur_n->edges->out_of_bounds || cur_n->edges->next->out_of_bounds)
-        {
-            return 1;
-        }
-
-        cur_n = cur_n->next;
-    }
-
-    return 0;
-}
-
 void illegal_detect(struct chemicals *chems, char *addr)
 {
     char *username = getlogin();
@@ -351,7 +334,7 @@ void remove_air(struct chemicals *chems)
             if (right_n->data.value == 0)
             {
                 cur_n->edges->next->node = right_n->edges->node;
-                if (cur_n->edges->next->node &&cur_n->edges->next->node->data.value != 0)
+                if (cur_n->edges->next->node && cur_n->edges->next->node->data.value != 0)
                 {
                     cur_n->edges->next->node->edge_inbound++;
                 }
@@ -390,6 +373,29 @@ void remove_air(struct chemicals *chems)
     chems->chemicals_cur->type = graph_evaluate(chems->chemicals_cur->nodes);
 }
 
+int trash_detect(struct chemicals *chems)
+{
+    struct _node *cur_n = chems->chemicals_cur->nodes;
+
+    while(cur_n)
+    {
+    //     if ((cur_n->edges->next->node && !_graph_find(chems->chemicals_cur->nodes, cur_n->edges->next->node))
+    //     || (cur_n->edges->node && !_graph_find(chems->chemicals_cur->nodes, cur_n->edges->node))
+    //     || cur_n->edges->out_of_bounds || cur_n->edges->next->out_of_bounds)
+    //     {
+    //         return 1;
+    //     }
+        if (cur_n->edges->out_of_bounds || cur_n->edges->next->out_of_bounds)
+        {
+            return 1;
+        }
+
+        cur_n = cur_n->next;
+    }
+
+    return 0;
+}
+
 void remove_trash(struct chemicals *chems)
 {
     struct _node *mov_n = NULL;
@@ -399,9 +405,11 @@ void remove_trash(struct chemicals *chems)
     while(cur_n)
     {
 
-        if ((cur_n->edges->next->node && !_graphFind(chems->chemicals_cur->nodes, cur_n->edges->next->node->data.value))
-        || (cur_n->edges->node && !_graphFind(chems->chemicals_cur->nodes, cur_n->edges->node->data.value))
-        || cur_n->edges->out_of_bounds || cur_n->edges->next->out_of_bounds)
+        // if ((cur_n->edges->next->node && !_graph_find(chems->chemicals_cur->nodes, cur_n->edges->next->node))
+        // || (cur_n->edges->node && !_graph_find(chems->chemicals_cur->nodes, cur_n->edges->node))
+        // || cur_n->edges->out_of_bounds || cur_n->edges->next->out_of_bounds)
+        // {
+        if (cur_n->edges->out_of_bounds || cur_n->edges->next->out_of_bounds)
         {
             mov_n = cur_n;
             cur_n = cur_n->next;
@@ -616,16 +624,12 @@ void free_chemicals(struct chemicals *chems)
     {
         return;
     }
-    free_chem_idx(chems->chlorine);
-    free(chems->chemicals);
-    graphDestroy(chems->chemicals_cur);
+    graphDestroy(chems->liquid_g);
     graphDestroy(chems->hazmat_g);
     graphDestroy(chems->sludge_g);
     graphDestroy(chems->trash_g);
-    if (chems->sludge)
-    {
-        free(chems->sludge);
-    }
+    graphDestroy(chems->chlorine_g);
+
     free(chems);
 }
 

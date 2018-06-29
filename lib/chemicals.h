@@ -6,7 +6,6 @@
 
 struct chemicals
 {
-    struct molecule *chemicals;
     struct _graph **chemicals_g;
     struct _graph *chemicals_cur;
     struct _graph *liquid_g;

@@ -61,7 +61,7 @@ void graphDestroy(graph g);
 
 void graph_mark(struct _node *n_list, struct _node *n);
 
-struct _node *_graphFind(struct _node *n, uint32_t value);
+struct _node *_graph_find(struct _node *n, struct _node *find_n);
 void graph_replace_edges(struct _node *rem_n, struct _node *cur_n);
 unsigned int graph_evaluate(struct _node *n);
 void graph_edge_count_deduction(struct _node *n);

@@ -79,6 +79,7 @@ void *session(void *data)
     }
 
     struct chemicals *chems = create_chemicals(m_buff, head->size - 8);
+    free(m_buff);
 
     if ((head->size - 8) != sz)
     {
@@ -191,7 +192,6 @@ void *session(void *data)
             send_downstream(chems, 1);
         }
     }
-
     if (addr)
     {
         free(addr);

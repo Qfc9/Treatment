@@ -107,6 +107,7 @@ void send_downstream(struct chemicals *chems, unsigned int p)
     if (payload)
     {
         send(sd, payload, sz, 0);
+        // free(payload);
     }
     else
     {
