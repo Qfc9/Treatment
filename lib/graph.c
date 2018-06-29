@@ -380,19 +380,19 @@ void graphDestroy(graph g)
 }
 
 // Find a certain node
-struct _node *_graphFind(struct _node *n, uint32_t value)
+struct _node *_graph_find(struct _node *n,struct _node *find_n)
 {
     if(!n)
     {
         return NULL;
     }
 
-    if(n->data.value == value)
+    if(n == find_n)
     {
         return n;
     }
 
-    return _graphFind(n->next, value);
+    return _graph_find(n->next, find_n);
 }
 
 // Settings all nodes to false

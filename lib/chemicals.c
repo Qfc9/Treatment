@@ -164,8 +164,8 @@ int trash_detect(struct chemicals *chems)
 
     while(cur_n)
     {
-        if ((cur_n->edges->next->node && !_graphFind(chems->chemicals_g->nodes, cur_n->edges->next->node->data.value))
-        || (cur_n->edges->node && !_graphFind(chems->chemicals_g->nodes, cur_n->edges->node->data.value))
+        if ((cur_n->edges->next->node && !_graph_find(chems->chemicals_g->nodes, cur_n->edges->next->node))
+        || (cur_n->edges->node && !_graph_find(chems->chemicals_g->nodes, cur_n->edges->node))
         || cur_n->edges->out_of_bounds || cur_n->edges->next->out_of_bounds)
         {
             return 1;
@@ -309,8 +309,8 @@ void remove_trash(struct chemicals *chems)
     while(cur_n)
     {
 
-        if ((cur_n->edges->next->node && !_graphFind(chems->chemicals_g->nodes, cur_n->edges->next->node->data.value))
-        || (cur_n->edges->node && !_graphFind(chems->chemicals_g->nodes, cur_n->edges->node->data.value))
+        if ((cur_n->edges->next->node && !_graph_find(chems->chemicals_g->nodes, cur_n->edges->next->node))
+        || (cur_n->edges->node && !_graph_find(chems->chemicals_g->nodes, cur_n->edges->node))
         || cur_n->edges->out_of_bounds || cur_n->edges->next->out_of_bounds)
         {
             mov_n = cur_n;
