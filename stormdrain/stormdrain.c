@@ -94,9 +94,23 @@ void *session(void *data)
         break_up_compounds(chems);
         analyze(chems);
 
+        unsigned int asdf = 0;
+        graph_size(chems->chemicals_g[0]->nodes, &asdf);
+        graphPrint(chems->chemicals_g[1]);
+        printf("SIZE: %u\n", asdf);
+        printf("SIZE: %u\n", chems->chemicals_sz);
+
         for (unsigned int i = 1; i < chems->chemicals_sz; ++i)
         {
+            asdf = 0;
+            graph_size(chems->chemicals_g[i]->nodes, &asdf);
+            printf("SIZE: %u\n", asdf);
+
             chems->chemicals_cur = chems->chemicals_g[i];
+            if (!chems->chemicals_cur->nodes)
+            {
+                continue;
+            }
 
             if (chems->chemicals_cur->type == GRAPH)
             {
@@ -164,33 +178,33 @@ void *session(void *data)
             graphPrint(chems->liquid_g);
         }
 
-        illegal_detect(chems, addr);
+        // illegal_detect(chems, addr);
 
-        graph_payload(chems->trash_g);
-        sludgified(chems);
-        graph_payload(chems->hazmat_g);
-        graph_payload(chems->liquid_g);
+        // graph_payload(chems->trash_g);
+        // sludgified(chems);
+        // graph_payload(chems->hazmat_g);
+        // graph_payload(chems->liquid_g);
 
-        if (chems->trash_g->payload)
-        {
-            printf("SENDING TRASH\n");
-            send_downstream(chems, 2);
-        }
-        if (chems->sludge)
-        {
-            printf("SENDING SLUDGE\n");
-            send_downstream(chems, 4);
-        }
-        if (chems->hazmat_g->payload)
-        {
-            printf("SENDING HAZMAT\n");
-            send_downstream(chems, 8);
-        }
-        if (chems->liquid_g->payload)
-        {
-            printf("SENDING LIQUID\n");
-            send_downstream(chems, 1);
-        }
+        // if (chems->trash_g->payload)
+        // {
+        //     printf("SENDING TRASH\n");
+        //     send_downstream(chems, 2);
+        // }
+        // if (chems->sludge)
+        // {
+        //     printf("SENDING SLUDGE\n");
+        //     send_downstream(chems, 4);
+        // }
+        // if (chems->hazmat_g->payload)
+        // {
+        //     printf("SENDING HAZMAT\n");
+        //     send_downstream(chems, 8);
+        // }
+        // if (chems->liquid_g->payload)
+        // {
+        //     printf("SENDING LIQUID\n");
+        //     send_downstream(chems, 1);
+        // }
     }
     if (addr)
     {

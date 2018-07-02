@@ -144,13 +144,14 @@ void break_up_compounds(struct chemicals *chems)
         }
         if (!cur_n)
         {
+            printf("BREAK!\n");
             break;
         }
 
         cur_n->visited = true;
         sz = 0;
 
-        for (unsigned int i = 0; i < chems->chemicals_sz; ++i)
+        for (unsigned int i = 0; i < chems->chemicals_sz+1; ++i)
         {
             graph_mark(cur_n, cur_n);
         }
