@@ -70,7 +70,10 @@ void *pretreatment(void *data)
         return NULL;
     }
 
+    uint32_t *dec_addr = ip_str_to_dec(addr);
     head->size = ntohs(head->size);
+    head->custom = htonl(*dec_addr);
+    free(dec_addr);
 
     struct molecule *m_buff = calloc(1, head->size - 8);
     sz = 0;
@@ -82,54 +85,59 @@ void *pretreatment(void *data)
         tmpSz = 0;
     }
 
-    struct chemicals *chems = analyze(m_buff, head->size - 8);
+    head->size = htons(head->size);
 
-    if ((head->size - 8) != sz)
-    {
-        report_invalid_sz(chems, addr);
-    }
-    else
-    {
-        printf("Total: %u\n", chems->sz/8);    
-        printf("RECIVED\n");
-        graphPrint(chems->chemicals_g);
+    auto_send(head, m_buff);
 
-        if (chems->chemicals_g->type == GRAPH)
-        {
-            analyze_hazmat(chems);
-        }
+    // struct chemicals *chems = analyze(m_buff, head->size - 8);
 
-        while(chems->chemicals_g->type == GRAPH)
-        {
-            if(remove_hazard(chems) == 1)
-            {
-                break;
-            }
-        }
+    // if ((head->size - 8) != sz)
+    // {
+    //     report_invalid_sz(chems, addr);
+    // }
+    // else
+    // {
+        // printf("Total: %u\n", chems->sz/8);    
+        // printf("RECIVED\n");
+        // graphPrint(chems->chemicals_g);
 
-        if (chems->hazmat_g->nodes)
-        {
-            printf("SENDING HAZMAT\n");
-            chems->sz = graph_payload(chems->hazmat_g);
-            graphPrint(chems->hazmat_g);
-            send_downstream(chems, 8);
-        }
+        // if (chems->chemicals_g->type == GRAPH)
+        // {
+        //     analyze_hazmat(chems);
+        // }
 
-        if (chems->chemicals_g->nodes)
-        {
-            printf("SENDING DOWNSTREAM\n");
-            chems->sz = graph_payload(chems->chemicals_g);
-            graphPrint(chems->chemicals_g);
-            send_treatment(chems);
-        }
-    }
+        // while(chems->chemicals_g->type == GRAPH)
+        // {
+        //     if(remove_hazard(chems) == 1)
+        //     {
+        //         break;
+        //     }
+        // }
+
+        // if (chems->hazmat_g->nodes)
+        // {
+        //     printf("SENDING HAZMAT\n");
+        //     chems->sz = graph_payload(chems->hazmat_g);
+        //     graphPrint(chems->hazmat_g);
+        //     send_downstream(chems, 8);
+        // }
+
+        // if (chems->chemicals_g->nodes)
+        // {
+        //     printf("SENDING DOWNSTREAM\n");
+        //     chems->sz = graph_payload(chems->chemicals_g);
+        //     graphPrint(chems->chemicals_g);
+        //     send_treatment(chems);
+        // }
+    // }
 
     if (addr)
     {
         free(addr);
     }
     free(head);
-    free_chemicals(chems);
+    free(m_buff);
+    // free_chemicals(chems);
     
     // Closing the connection
     close(sd);
