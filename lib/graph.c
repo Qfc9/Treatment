@@ -137,10 +137,13 @@ void graph_set_payload(graph g, struct _node *n, uint32_t *idx)
         g->payload[(*idx)].right = htons(graph_node_idx(g->nodes, n->edges->next->node->data.value));
     }
 
-    if (n->edges->out_of_bounds || n->edges->next->out_of_bounds)
+    if (n->edges->out_of_bounds)
+    {
+        g->payload[(*idx)].left = 0xFFFF;
+    }
+    else if (n->edges->next->out_of_bounds)
     {
         g->payload[(*idx)].right = 0xFFFF;
-        g->payload[(*idx)].left = 0xFFFF;
     }
 
     (*idx)++;
