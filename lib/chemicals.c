@@ -164,9 +164,15 @@ int trash_detect(struct chemicals *chems)
 
     while(cur_n)
     {
-        if ((cur_n->edges->next->node && !_graph_find(chems->chemicals_g->nodes, cur_n->edges->next->node))
-        || (cur_n->edges->node && !_graph_find(chems->chemicals_g->nodes, cur_n->edges->node))
-        || cur_n->edges->out_of_bounds || cur_n->edges->next->out_of_bounds)
+        if (cur_n->edges->out_of_bounds || cur_n->edges->next->out_of_bounds)
+        {
+            return 1;
+        }
+        if (cur_n->edges->node && !_graph_find(chems->chemicals_g->nodes, cur_n->edges->node))
+        {
+            return 1;
+        }
+        if (cur_n->edges->next->node && !_graph_find(chems->chemicals_g->nodes, cur_n->edges->next->node))
         {
             return 1;
         }
