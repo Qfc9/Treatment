@@ -308,43 +308,76 @@ void remove_trash(struct chemicals *chems)
 
     while(cur_n)
     {
-
-        if ((cur_n->edges->next->node && !_graph_find(chems->chemicals_g->nodes, cur_n->edges->next->node))
-        || (cur_n->edges->node && !_graph_find(chems->chemicals_g->nodes, cur_n->edges->node))
-        || cur_n->edges->out_of_bounds || cur_n->edges->next->out_of_bounds)
+        mov_n = cur_n;
+        cur_n = cur_n->next;
+        mov_n->next = NULL;
+        
+        if (!prev_n)
         {
-            mov_n = cur_n;
-            cur_n = cur_n->next;
-            mov_n->next = NULL;
-            
-            if (!prev_n)
-            {
-                chems->chemicals_g->nodes = cur_n;
-            }
-            else
-            {
-                prev_n->next = cur_n;
-            }
-            
-            if (!chems->trash_g->nodes)
-            {
-                chems->trash_g->nodes = mov_n;
-            }
-            else
-            {
-                graph_add_existing_node(chems->trash_g->nodes, mov_n);
-            }
-
-            graph_edge_count_deduction(mov_n);
+            chems->chemicals_g->nodes = cur_n;
         }
         else
         {
-            prev_n = cur_n;
-            cur_n = cur_n->next;
+            prev_n->next = cur_n;
+        }
+        
+        if (!chems->trash_g->nodes)
+        {
+            chems->trash_g->nodes = mov_n;
+        }
+        else
+        {
+            graph_add_existing_node(chems->trash_g->nodes, mov_n);
         }
     }
-    chems->chemicals_g->type = graph_evaluate(chems->chemicals_g->nodes);
 }
+
+
+// void remove_trash(struct chemicals *chems)
+// {
+//     struct _node *mov_n = NULL;
+//     struct _node *cur_n = chems->chemicals_g->nodes;
+//     struct _node *prev_n = NULL;
+
+//     while(cur_n)
+//     {
+
+//         if ((cur_n->edges->next->node && !_graph_find(chems->chemicals_g->nodes, cur_n->edges->next->node))
+//         || (cur_n->edges->node && !_graph_find(chems->chemicals_g->nodes, cur_n->edges->node))
+//         || cur_n->edges->out_of_bounds || cur_n->edges->next->out_of_bounds)
+//         {
+//             mov_n = cur_n;
+//             cur_n = cur_n->next;
+//             mov_n->next = NULL;
+            
+//             if (!prev_n)
+//             {
+//                 chems->chemicals_g->nodes = cur_n;
+//             }
+//             else
+//             {
+//                 prev_n->next = cur_n;
+//             }
+            
+//             if (!chems->trash_g->nodes)
+//             {
+//                 chems->trash_g->nodes = mov_n;
+//             }
+//             else
+//             {
+//                 graph_add_existing_node(chems->trash_g->nodes, mov_n);
+//             }
+
+//             graph_edge_count_deduction(mov_n);
+//         }
+//         else
+//         {
+//             prev_n = cur_n;
+//             cur_n = cur_n->next;
+//         }
+//     }
+//     chems->chemicals_g->type = graph_evaluate(chems->chemicals_g->nodes);
+// }
 
 void remove_ammonia(struct chemicals *chems)
 {
