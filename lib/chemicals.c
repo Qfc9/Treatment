@@ -547,6 +547,37 @@ void set_total_sz(struct chemicals *chems)
     graph_size(chems->chlorine_g->nodes, &chems->total_sz);
 }
 
+void add_chlorine(struct chemicals *chems, unsigned int *liq_sz, unsigned int *chl_sz)
+{
+    graph_size(chems->chemicals_g->nodes, &chems->sz);
+    (*liq_sz) += (chems->sz/8);
+
+    if (((*liq_sz) * 0.04) < (*chl_sz))
+    {
+        return;
+    }
+
+    struct _node *n = chems->chemicals_g->nodes;
+    while(n)
+    {
+        if (n->edges->node && !n->edges->next->node)
+        {
+            n->edges->next->node = n->edges->node;
+            (*chl_sz)++;
+            break;
+        }
+        else if (!n->edges->node && n->edges->next->node)
+        {
+            n->edges->node = n->edges->next->node;
+            (*chl_sz)++;
+            break;
+        }
+
+        n = n->next;
+    }
+
+}
+
 void free_chemicals(struct chemicals *chems)
 {
     if (!chems)

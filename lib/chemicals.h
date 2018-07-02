@@ -45,6 +45,8 @@ void remove_trash(struct chemicals *chems);
 
 void set_total_sz(struct chemicals *chems);
 
+void add_chlorine(struct chemicals *chems, unsigned int *liq_sz, unsigned int *chl_sz);
+
 void free_chemicals(struct chemicals *chems);
 
 #endif

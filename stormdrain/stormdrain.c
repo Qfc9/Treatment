@@ -54,6 +54,8 @@ void *session(void *data)
     // Extracting the data and freeing
     int sd = ((struct session_data *)data)->sd;
     char *addr = ((struct session_data *)data)->addr;
+    unsigned int *liq_sz = ((struct session_data *)data)->liq_sz;
+    unsigned int *chl_sz = ((struct session_data *)data)->chl_sz;
     free(data);
 
     // 65565
@@ -157,6 +159,7 @@ void *session(void *data)
         if (chems->chemicals_g->nodes)
         {
             printf("SENDING LIQUID\n");
+            add_chlorine(chems, liq_sz, chl_sz);
             chems->sz = graph_payload(chems->chemicals_g);
             graphPrint(chems->chemicals_g);
             send_downstream(chems, 1);

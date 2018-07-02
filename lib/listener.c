@@ -91,8 +91,11 @@ void *listener(void *data)
 
     pthread_t sessions;
     struct session_data *s_data;
+    unsigned int liq_sz = 0;
+    unsigned int chl_sz = 0;
     // Incoming loop
     while(1) {
+        printf("LIQ: %u CHL: %u\n", liq_sz, chl_sz);
         struct sockaddr_storage remote = {0};
         socklen_t remote_sz = sizeof(remote);
 
@@ -122,6 +125,8 @@ void *listener(void *data)
 
         s_data->sd = incoming;
         s_data->addr = addr;
+        s_data->liq_sz = &liq_sz;
+        s_data->chl_sz = &chl_sz;
 
         // Creating session threads Thread
         pthread_create(&sessions, &attr, data, s_data);
