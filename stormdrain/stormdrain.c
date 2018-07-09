@@ -78,6 +78,8 @@ void *session(void *data)
         tmpSz = 0;
     }
 
+    printf("Total: %zu\n", sz/8);    
+    printf("RECIVED\n");
     struct chemicals *chems = create_chemicals(m_buff, head->size - 8);
     free(m_buff);
 
@@ -87,34 +89,20 @@ void *session(void *data)
     }
     else
     {
-        printf("Total: %u\n", chems->sz/8);    
-        printf("RECIVED\n");
-        graphPrint(chems->chemicals_g[0]);
-
         break_up_compounds(chems);
         analyze(chems);
 
-        unsigned int asdf = 0;
-        graph_size(chems->chemicals_g[0]->nodes, &asdf);
-        graphPrint(chems->chemicals_g[1]);
-        printf("SIZE: %u\n", asdf);
-        printf("SIZE: %u\n", chems->chemicals_sz);
-
         for (unsigned int i = 1; i < chems->chemicals_sz; ++i)
         {
-            asdf = 0;
-            graph_size(chems->chemicals_g[i]->nodes, &asdf);
-            printf("SIZE: %u\n", asdf);
-
             chems->chemicals_cur = chems->chemicals_g[i];
             if (!chems->chemicals_cur->nodes)
             {
                 continue;
             }
 
-            if (chems->chemicals_cur->type == GRAPH)
+            while(remove_fungus(chems) != 1)
             {
-                analyze_hazmat(chems);
+                break_up_air(chems);
             }
 
             while(chems->chemicals_cur->type == GRAPH)
@@ -128,7 +116,7 @@ void *session(void *data)
             remove_ammonia(chems);
             remove_air(chems);
 
-            while(trash_detect(chems))
+            if(trash_detect(chems))
             {
                 remove_trash(chems);
             }
@@ -178,33 +166,33 @@ void *session(void *data)
             graphPrint(chems->liquid_g);
         }
 
-        // illegal_detect(chems, addr);
+        illegal_detect(chems, addr);
 
-        // graph_payload(chems->trash_g);
-        // sludgified(chems);
-        // graph_payload(chems->hazmat_g);
-        // graph_payload(chems->liquid_g);
+        graph_payload(chems->trash_g);
+        sludgified(chems);
+        graph_payload(chems->hazmat_g);
+        graph_payload(chems->liquid_g);
 
-        // if (chems->trash_g->payload)
-        // {
-        //     printf("SENDING TRASH\n");
-        //     send_downstream(chems, 2);
-        // }
-        // if (chems->sludge)
-        // {
-        //     printf("SENDING SLUDGE\n");
-        //     send_downstream(chems, 4);
-        // }
-        // if (chems->hazmat_g->payload)
-        // {
-        //     printf("SENDING HAZMAT\n");
-        //     send_downstream(chems, 8);
-        // }
-        // if (chems->liquid_g->payload)
-        // {
-        //     printf("SENDING LIQUID\n");
-        //     send_downstream(chems, 1);
-        // }
+        if (chems->trash_g->payload)
+        {
+            printf("SENDING TRASH\n");
+            send_downstream(chems, 2);
+        }
+        if (chems->sludge)
+        {
+            printf("SENDING SLUDGE\n");
+            send_downstream(chems, 4);
+        }
+        if (chems->hazmat_g->payload)
+        {
+            printf("SENDING HAZMAT\n");
+            send_downstream(chems, 8);
+        }
+        if (chems->liquid_g->payload)
+        {
+            printf("SENDING LIQUID\n");
+            send_downstream(chems, 1);
+        }
     }
     if (addr)
     {

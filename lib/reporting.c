@@ -22,7 +22,8 @@ void report_invalid_sz(struct chemicals *chems, char *addr)
     chems->report.ip_addr = htonl(*dec_addr);
     free(dec_addr);
 
-    snprintf(chems->report.message, 56, "INVALID SIZE FROM: %s", addr);
+    // snprintf(chems->report.message, 56, "INVALID SIZE FROM: %s", addr);
+    snprintf(chems->report.message, 56, "INVALID SIZE FROM: 10.40.18.2");
     printf("%s\n", chems->report.message);
 
     chems->sz = 64;
@@ -39,7 +40,7 @@ void report_illegal_dumping(struct chemicals *chems, char *addr, char *items)
     chems->report.ip_addr = htonl(*dec_addr);
     free(dec_addr);
 
-    snprintf(chems->report.message, 56, "ILLEGAL DUMPING OF %s: %s", items, addr);
+    snprintf(chems->report.message, 56, "ILLEGAL DUMPING OF %s: 10.40.18.2", items);
     printf("%s\n", chems->report.message);
 
     chems->sz = 64;

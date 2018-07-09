@@ -376,6 +376,30 @@ struct _node *graph_find_by_idx(graph g, uint32_t idx)
     return NULL;
 }
 
+void graph_calculate_edges(graph g)
+{
+    struct _node *n = g->nodes;
+    while(n)
+    {
+        n->edge_inbound = 0;
+        n = n->next;
+    }
+
+    n = g->nodes;
+    while(n)
+    {
+        if (n->edges->node)
+        {
+            n->edges->node->edge_inbound++;
+        }
+        if (n->edges->next->node && n->edges->next->node != n->edges->node)
+        {
+            n->edges->next->node->edge_inbound++;
+        }
+        n = n->next;
+    }
+}
+
 // Adding an edge to the graph
 void graph_add_edge(graph g, uint32_t n1_pos, uint32_t n2_pos)
 {
@@ -387,16 +411,14 @@ void graph_add_edge(graph g, uint32_t n1_pos, uint32_t n2_pos)
     struct _node *a = graph_find_by_idx(g, n1_pos);
     struct _node *b = graph_find_by_idx(g, n2_pos);
 
-    struct _edge *newEdge = calloc(1, sizeof(*newEdge));
-    newEdge->node = b;
-    newEdge->out_of_bounds = false;
+    struct _edge *new_edge = calloc(1, sizeof(*new_edge));
+    new_edge->node = b;
+    new_edge->out_of_bounds = false;
 
-    if (!b && n2_pos != 0)
+    if ((!b && n2_pos != 0) || ((g->sz / 8)) < n2_pos)
     {
-        newEdge->out_of_bounds = true;
+        new_edge->out_of_bounds = true;
     }
-
-    struct _edge *curEdge = a->edges;
 
     if(!a->edges)
     {
@@ -404,25 +426,19 @@ void graph_add_edge(graph g, uint32_t n1_pos, uint32_t n2_pos)
         {
             b->edge_inbound++;
         }
-        a->edges = newEdge;
+        a->edges = new_edge;
         return;
     }
 
     if (b)
     {
-        if (!(curEdge->node != NULL && curEdge->node == newEdge->node))
+        if (!(a->edges->node != NULL && a->edges->node == new_edge->node))
         {
             b->edge_inbound++;
         }
     }
 
-    while(curEdge->next)
-    {
-        curEdge = curEdge->next;
-    }
-
-    curEdge->next = newEdge;
-
+    a->edges->next = new_edge;
 }
 
 // Destroying the graph

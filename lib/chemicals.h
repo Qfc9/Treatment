@@ -41,12 +41,14 @@ void chlorine_detect(struct chemicals *chems);
 void analyze_hazmat(struct chemicals *chems);
 int trash_detect(struct chemicals *chems);
 void remove_feces(struct chemicals *chems);
+int remove_fungus(struct chemicals *chems);
 int remove_hazard(struct chemicals *chems);
 void remove_ammonia(struct chemicals *chems);
 void remove_air(struct chemicals *chems);
 void remove_trash(struct chemicals *chems);
 
 void break_up_compounds(struct chemicals *chems);
+void break_up_air(struct chemicals *chems);
 
 void set_total_sz(struct chemicals *chems);
 

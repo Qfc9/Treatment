@@ -15,3 +15,14 @@ rm mount/pretreatment/lib/*.o
 rm mount/pretreatment/source/*.o
 
 # cp dummy/dummy remote/
+
+eharmon@tdqc4:~/submit/treatmentPlant/stormdrain$ scp -P 3066 stormdrain root@10.15.30.4:/root/resident
+root@10.15.30.4's password: 
+stormdrain                                               100%  103KB 102.6KB/s   00:00    
+eharmon@tdqc4:~/submit/treatmentPlant/stormdrain$ scp -P 3130 stormdrain root@10.15.30.4:/root/stormdrain
+root@10.15.30.4's password: 
+stormdrain                                               100%  103KB 102.6KB/s   00:00    
+eharmon@tdqc4:~/submit/treatmentPlant/stormdrain$ scp -P 3001 stormdrain root@10.15.30.4:/root/treatment
+root@10.15.30.4's password: 
+stormdrain                                               100%  103KB 102.6KB/s   00:00    
+eharmon@tdqc4:~/submit/treatmentPlant/stormdrain$ 

@@ -59,6 +59,7 @@ void graph_add_edge(graph g, uint32_t n1, uint32_t n2);
 bool graphPrintPath(graph g, char **data, size_t sz, char start, char end, size_t search);
 void graphDestroy(graph g);
 
+void graph_calculate_edges(graph g);
 void graph_mark(struct _node *n_list, struct _node *n);
 
 struct _node *_graph_find(struct _node *n, struct _node *find_n);
