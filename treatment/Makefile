@@ -5,9 +5,15 @@ ARFLAGS += -U
 
 DEBUG = -DDEBUG -g
 
-BINS = sludger
+# BINS = sludger
 
-FILES = sludger.o structs.o networking.o libscrypt/libscrypt.a
+# FILES = sludger.o structs.o networking.o libscrypt/libscrypt.a
+
+
+BINS = treatment
+
+FILES = treatment.o ../lib/listener.o ../lib/payloads.o ../lib/response.o ../lib/chlorine.o
+
 
 all: build
 

@@ -5,25 +5,13 @@ ARFLAGS += -U
 
 DEBUG = -DDEBUG -g
 
-BINS = residential
+BINS = testing
 
-FILES = residential.o ../lib/listener.o ../lib/payloads.o ../lib/response.o
+FILES = testing.o ../lib/util.o
 
 all: build
 
 .PHONY: all
-
-debug: CFLAGS += -DDEBUG -g
-debug: CPPFLAGS += -DDEBUG -g
-debug:  $(FILES)
-	gcc -o $(BINS) $(FILES) $(CPPFLAGS) $(CFLAGS)
-	$(MAKE) clean
-
-profile: CFLAGS += -pg
-profile: CPPFLAGS += -pg
-profile: $(FILES)
-	gcc -o $(BINS) $(FILES) $(CPPFLAGS) $(CFLAGS)
-	$(MAKE) clean
 
 build: $(FILES)
 	gcc -o $(BINS) $(FILES) $(CPPFLAGS) $(CFLAGS)

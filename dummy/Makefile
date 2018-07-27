@@ -1,14 +1,14 @@
-CPPFLAGS += -Wall -Wextra -Wpedantic -Wwrite-strings -Wstack-usage=1024 -Wfloat-equal -Waggregate-return -Winline -I
+CPPFLAGS += -Wall -Wextra -Wpedantic -Wwrite-strings -Wfloat-equal -Waggregate-return -Winline -I
 CPPFLAGS += -D_XOPEN_SOURCE -pthread
 CFLAGS += -std=c11 -lm 
 ARFLAGS += -U
 
 DEBUG = -DDEBUG -g
 
-BINS = stormdrain
+BINS = dummy
 
-FILES = stormdrain.o ../lib/listener.o ../lib/payloads.o ../lib/response.o ../lib/chemicals.o ../lib/graph.o ../lib/util.o
-FILES += ../lib/crypt.o ../lib/libscrypt/libscrypt.a ../lib/reporting.o
+FILES = dummy.o ../lib/payloads.o
+
 all: build
 
 .PHONY: all

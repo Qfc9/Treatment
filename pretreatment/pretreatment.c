@@ -1,4 +1,5 @@
 #define _XOPEN_SOURCE 600
+#define _WITH_DPRINTF
 
 #include <signal.h>
 #include <netdb.h>
@@ -7,6 +8,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <pthread.h>
+#include <fcntl.h>
+#include <unistd.h>
 
 #include <arpa/inet.h>
 #include <sys/types.h>
@@ -17,14 +20,15 @@
 #include "../lib/payloads.h"
 #include "../lib/listener.h"
 #include "../lib/response.h"
-#include "../lib/crypt.h"
 #include "../lib/util.h"
 #include "../lib/reporting.h"
 
-void *session(void *data);
+void *pretreatment(void *data);
 
 int main(void)
 {
+    char done[16];
+
     // Thread init
     pthread_t thread;
     pthread_attr_t  attr;
@@ -32,12 +36,12 @@ int main(void)
     pthread_attr_init(&attr);
     pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
 
-    pthread_create(&thread, &attr, listener, session);
+    pthread_create(&thread, &attr, listener, pretreatment);
 
     // Printing and waiting for an enter to end
     printf("Server Online...\n");
     printf("Press enter to close the server...\n");
-    getc(stdin);
+    scanf("%s", done);
 
     // Killing all the threads
     pthread_kill(thread, SIGINT);
@@ -49,7 +53,7 @@ int main(void)
 }
 
 // Gets ran for every incoming connection
-void *session(void *data)
+void *pretreatment(void *data)
 {
     // Extracting the data and freeing
     int sd = ((struct session_data *)data)->sd;
@@ -78,10 +82,7 @@ void *session(void *data)
         tmpSz = 0;
     }
 
-    printf("Total: %zu\n", sz/8);    
-    printf("RECIVED\n");
     struct chemicals *chems = create_chemicals(m_buff, head->size - 8);
-    free(m_buff);
 
     if ((head->size - 8) != sz)
     {
@@ -89,20 +90,20 @@ void *session(void *data)
     }
     else
     {
+        printf("Total: %u\n", chems->sz/8);    
+        printf("RECIVED\n");
+        graphPrint(chems->chemicals_g[0]);
+
         break_up_compounds(chems);
         analyze(chems);
 
         for (unsigned int i = 1; i < chems->chemicals_sz; ++i)
         {
             chems->chemicals_cur = chems->chemicals_g[i];
-            if (!chems->chemicals_cur->nodes)
-            {
-                continue;
-            }
 
-            while(remove_fungus(chems) != 1)
+            if (chems->chemicals_cur->type == GRAPH)
             {
-                break_up_air(chems);
+                analyze_hazmat(chems);
             }
 
             while(chems->chemicals_cur->type == GRAPH)
@@ -112,16 +113,6 @@ void *session(void *data)
                     break;
                 }
             }
-            remove_feces(chems);
-            remove_ammonia(chems);
-            remove_air(chems);
-
-            if(trash_detect(chems))
-            {
-                remove_trash(chems);
-            }
-
-            chlorine_detect(chems);
         }
 
         struct _node *end_n = NULL;
@@ -150,16 +141,6 @@ void *session(void *data)
             printf("HAZMAT:\n");
             graphPrint(chems->hazmat_g);
         }
-        if (chems->sludge_g->nodes)
-        {
-            printf("SLUDGE:\n");
-            graphPrint(chems->sludge_g);
-        }
-        if (chems->trash_g->nodes)
-        {
-            printf("TRASH:\n");
-            graphPrint(chems->trash_g);
-        }
         if (chems->liquid_g->nodes)
         {
             printf("LIQUID:\n");
@@ -167,22 +148,9 @@ void *session(void *data)
         }
 
         illegal_detect(chems, addr);
-
-        graph_payload(chems->trash_g);
-        sludgified(chems);
         graph_payload(chems->hazmat_g);
         graph_payload(chems->liquid_g);
 
-        if (chems->trash_g->payload)
-        {
-            printf("SENDING TRASH\n");
-            send_downstream(chems, 2);
-        }
-        if (chems->sludge)
-        {
-            printf("SENDING SLUDGE\n");
-            send_downstream(chems, 4);
-        }
         if (chems->hazmat_g->payload)
         {
             printf("SENDING HAZMAT\n");
@@ -190,10 +158,11 @@ void *session(void *data)
         }
         if (chems->liquid_g->payload)
         {
-            printf("SENDING LIQUID\n");
-            send_downstream(chems, 1);
+            printf("SENDING DOWNSTREAM\n");
+            send_treatment(chems);
         }
     }
+
     if (addr)
     {
         free(addr);
